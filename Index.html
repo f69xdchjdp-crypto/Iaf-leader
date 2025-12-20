@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IAF Leader Companion</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- LEFT MENU -->
+  <aside id="menu">
+    <h2>IAF Leader</h2>
+
+    <section>
+      <label>Campaign</label>
+      <select id="campaignSelect">
+        <option value="ds91">1991 Desert Storm (Intro)</option>
+      </select>
+    </section>
+
+    <section>
+      <label>Campaign Length</label>
+      <select disabled>
+        <option>Short (3 Days)</option>
+      </select>
+    </section>
+
+    <section>
+      <label>Mission</label>
+      <select disabled>
+        <option>Intro Mission</option>
+      </select>
+    </section>
+
+    <section>
+      <label>Pilots</label>
+      <button onclick="showScreen('pilots')">Select Pilots</button>
+    </section>
+
+    <section>
+      <label>Aircraft</label>
+      <button onclick="showScreen('aircraft')">Select Aircraft</button>
+    </section>
+
+    <section>
+      <button id="startBtn" onclick="startMission()">START MISSION</button>
+    </section>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main id="content">
+    <div id="screen-title">Welcome</div>
+    <div id="screen-content">
+      <p>Select pilots and aircraft to begin the Intro campaign.</p>
+    </div>
+  </main>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
