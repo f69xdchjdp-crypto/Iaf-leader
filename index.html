@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>IAF Leader – Squadron Builder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header>
+  <h1>IAF Leader – Squadron Builder</h1>
+  <p class="subtitle">Prototype v0.3</p>
+</header>
+
+<section class="campaign">
+  <h2>Campaign: 1991 Desert Storm</h2>
+  <p class="overview">
+    After being repeatedly targeted by SCUD rockets, Israel launched a counterattack against Iraq
+    with the help of aerial refueling from American KC-135 Stratotankers.
+  </p>
+
+  <div class="options">
+    <label>
+      Difficulty:
+      <select disabled>
+        <option selected>Normal</option>
+      </select>
+    </label>
+
+    <label class="checkbox">
+      <input type="checkbox" checked disabled />
+      Standard Rules
+    </label>
+  </div>
+</section>
+
+<section class="pilots">
+  <h2>Pilots (All Ranks Defined)</h2>
+  <div id="pilotList"></div>
+</section>
+
+<script src="app.js"></script>
+</body>
+</html>

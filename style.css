@@ -1,0 +1,67 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 1rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #111;
+  color: #eee;
+}
+
+header {
+  border-bottom: 1px solid #333;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  margin: 0;
+}
+
+.subtitle {
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.campaign,
+.pilots {
+  background: #1c1c1c;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.overview {
+  color: #ccc;
+  font-size: 0.95rem;
+}
+
+.options {
+  margin-top: 0.75rem;
+}
+
+.options label {
+  margin-right: 1rem;
+}
+
+.pilot-card {
+  background: #222;
+  border-left: 6px solid;
+  padding: 0.6rem 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.small {
+  font-size: 0.85rem;
+  color: #bbb;
+}
+
+/* Rank colours */
+.rank-Newbie  { border-color: #FF9800; }
+.rank-Green   { border-color: #4CAF50; }
+.rank-Average { border-color: #2196F3; }
+.rank-Skilled { border-color: #F44336; }
+.rank-Veteran { border-color: #9C27B0; }
+.rank-Ace     { border-color: #4F666A; }
