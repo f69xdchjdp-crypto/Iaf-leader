@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>IAF Leader</title>
+<style>
+:root{
+  --bg:#0a0908;--bg2:#111009;--bg3:#18160f;--bg4:#201e14;
+  --line:#252218;--line2:#352f1e;
+  --ink:#e4d9c0;--ink2:#8a7f65;--ink3:#4a4030;
+  --gold:#c8952a;--gold2:#f0b840;--gd:rgba(200,149,42,.13);
+  --red:#b82820;--red2:#e03830;--rdd:rgba(184,40,32,.15);
+  --green:#2a6830;--green2:#48a858;--grd:rgba(42,104,48,.15);
+  --blue:#1848a0;--blue2:#4080e0;--bld:rgba(24,72,160,.15);
+  --amber:#906020;--amber2:#d09030;--amd:rgba(144,96,32,.15);
+  --pu:#8030c0;--pu2:#c060f0;--pud:rgba(128,48,192,.13);
+  /* Rank colours — matching actual game cards */
+  --rk-N:#e0b800;--rk-G:#38a840;--rk-A:#3878d0;
+  --rk-S:#d03020;--rk-V:#b030a0;--rk-X:#7a7040;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg)}
+body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;color:var(--ink);font-size:13px}
+button,select{font-family:inherit;font-size:inherit;cursor:pointer}
+
+/* ── SHELL — always landscape layout ── */
+.shell{width:100%;height:100%;display:grid;
+  grid-template-columns:310px 1fr;grid-template-rows:44px 1fr;overflow:hidden}
+
+/* ── TOPBAR ── */
+.topbar{grid-column:1/-1;background:var(--bg2);border-bottom:2px solid var(--line2);
+  display:flex;align-items:center;z-index:20;overflow:hidden}
+.tb-logo{width:310px;flex-shrink:0;padding:0 13px;display:flex;align-items:center;
+  gap:8px;border-right:1px solid var(--line2);height:100%}
+.logo-iaf{font-size:17px;font-weight:900;letter-spacing:6px;color:var(--ink)}
+.logo-sub{font-size:7px;letter-spacing:4px;color:var(--gold);margin-top:1px}
+.tb-steps{flex:1;display:flex;height:100%}
+.step{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+  font-size:8px;font-weight:700;letter-spacing:2px;color:var(--ink3);
+  border-right:1px solid var(--line2);cursor:pointer;position:relative;
+  text-transform:uppercase;transition:color .15s}
+.step:last-child{border-right:none}
+.step.on{color:var(--gold2);background:rgba(200,149,42,.06)}
+.step.on::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--gold2)}
+.step.done{color:var(--green2)}
+.step.done::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--green2)}
+.step-n{width:17px;height:17px;border-radius:50%;border:1px solid currentColor;
+  display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800}
+.tb-right{display:flex;gap:5px;padding:0 11px;flex-shrink:0}
+.chip{background:var(--bg3);border:1px solid var(--line2);padding:2px 8px;
+  font-size:8px;font-weight:700;color:var(--ink2)}
+.chip b{color:var(--gold2)}
+
+/* ── PANELS ── */
+.lp,.rp{display:flex;flex-direction:column;overflow:hidden}
+.lp{background:var(--bg2);border-right:1px solid var(--line2)}
+.ph{flex-shrink:0;padding:8px 12px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;min-height:36px}
+.ph-t{font-size:8px;font-weight:700;letter-spacing:2.5px;color:var(--gold)}
+.ph-s{font-size:8px;color:var(--ink3)}
+.pb{flex:1;overflow-y:auto;padding:8px 11px;padding-bottom:56px}
+
+/* ── ACTION BAR ── */
+.abar{position:fixed;bottom:0;left:0;right:0;height:48px;
+  background:var(--bg2);border-top:1px solid var(--line2);
+  display:flex;align-items:center;padding:0 13px;gap:10px;z-index:15}
+.abar-info{flex:1;font-size:8px;color:var(--ink3)}
+
+/* ── TYPOGRAPHY ── */
+.sl{font-size:7px;font-weight:700;letter-spacing:3px;color:var(--gold);
+  margin:10px 0 5px;padding-bottom:3px;border-bottom:1px solid var(--line);text-transform:uppercase}
+.sl:first-child{margin-top:0}
+.card{background:var(--bg3);border:1px solid var(--line2);padding:8px 10px;margin-bottom:5px}
+.row{display:flex;align-items:center;justify-content:space-between;
+  padding:4px 0;border-bottom:1px solid var(--line);font-size:11px}
+.row:last-child{border-bottom:none}
+.rl{color:var(--ink2)}.rv{font-weight:700;color:var(--ink)}
+.rv.g{color:var(--green2)}.rv.r{color:var(--red2)}.rv.y{color:var(--gold2)}
+.rv.b{color:var(--blue2)}.rv.a{color:var(--amber2)}.rv.d{color:var(--ink3)}
+.fb{display:flex;align-items:center;justify-content:space-between}
+.flex{display:flex;align-items:center}.fw{flex-wrap:wrap}
+.gap4{gap:4px}.gap6{gap:6px}.gap8{gap:8px}
+.mt4{margin-top:4px}.mt6{margin-top:6px}.mt8{margin-top:8px}.mt12{margin-top:12px}
+.mb4{margin-bottom:4px}.mb6{margin-bottom:6px}.mb8{margin-bottom:8px}
+.dim{color:var(--ink2)}.tiny{font-size:8px}.sm{font-size:10px}.ctr{text-align:center}
+
+/* ── RANK BADGES ── */
+.bdg{display:inline-flex;align-items:center;padding:1px 6px;
+  font-size:8px;font-weight:700;letter-spacing:.5px;border:1px solid}
+.rN{background:rgba(224,184,0,.16); color:var(--rk-N);border-color:rgba(224,184,0,.35)}
+.rG{background:rgba(56,168,64,.16); color:var(--rk-G);border-color:rgba(56,168,64,.35)}
+.rA{background:rgba(56,120,208,.16);color:var(--rk-A);border-color:rgba(56,120,208,.35)}
+.rS{background:rgba(208,48,32,.16); color:var(--rk-S);border-color:rgba(208,48,32,.35)}
+.rV{background:rgba(176,48,160,.16);color:var(--rk-V);border-color:rgba(176,48,160,.35)}
+.rX{background:rgba(122,112,64,.2); color:var(--rk-X);border-color:rgba(122,112,64,.4)}
+.bGr{background:var(--grd);color:var(--green2);border-color:rgba(42,104,48,.3)}
+.bR{background:var(--rdd);color:var(--red2);border-color:rgba(184,40,32,.3)}
+.bG{background:var(--gd);color:var(--gold2);border-color:rgba(200,149,42,.3)}
+.bB{background:var(--bld);color:var(--blue2);border-color:rgba(24,72,160,.3)}
+.bA{background:var(--amd);color:var(--amber2);border-color:rgba(144,96,32,.3)}
+.bP{background:var(--pud);color:var(--pu2);border-color:rgba(128,48,192,.3)}
+.bX{background:rgba(255,255,255,.03);color:var(--ink3);border-color:var(--line2)}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;
+  padding:7px 13px;font-size:8px;font-weight:700;letter-spacing:1.5px;border:1px solid;text-transform:uppercase}
+.btn:active{opacity:.7}.btn.full{width:100%}.btn.sm{padding:4px 9px;letter-spacing:1px}
+.btn-g{background:var(--grd);border-color:var(--green);color:var(--green2)}
+.btn-y{background:var(--gd);border-color:var(--gold);color:var(--gold2)}
+.btn-r{background:var(--rdd);border-color:var(--red);color:var(--red2)}
+.btn-b{background:var(--bld);border-color:var(--blue2);color:var(--blue2)}
+.btn-a{background:var(--amd);border-color:var(--amber2);color:var(--amber2)}
+.btn-p{background:var(--pud);border-color:var(--pu);color:var(--pu2)}
+.btn-x{background:none;border-color:var(--line2);color:var(--ink3)}
+.rb{display:flex;gap:5px;margin-top:5px}.rb .btn{flex:1}
+
+/* ── OPTION PILLS ── */
+.opts{display:flex;gap:4px;flex-wrap:wrap;margin:4px 0}
+.op{background:var(--bg3);border:1px solid var(--line2);padding:5px 10px;
+  font-size:8px;font-weight:600;color:var(--ink2);cursor:pointer;letter-spacing:.5px}
+.op.sel{background:var(--gd);border-color:var(--gold);color:var(--gold2)}
+.op:active{opacity:.7}
+
+/* ── CAMPAIGN CARD ── */
+.cc{border:1px solid var(--line2);border-left:3px solid var(--line2);
+  padding:8px 10px;margin-bottom:4px;cursor:pointer;position:relative;background:var(--bg3)}
+.cc:active{background:var(--bg4)}
+.cc.sel{border-left-color:var(--green2);background:rgba(42,104,48,.06)}
+.cc.locked{opacity:.35;cursor:not-allowed}
+.cc-n{font-size:11px;font-weight:800;color:var(--ink)}
+.cc-y{font-size:7px;letter-spacing:2px;color:var(--amber2);margin:2px 0 4px}
+.cc-d{font-size:8px;color:var(--ink2);line-height:1.6;margin-bottom:4px}
+.cc-tags{display:flex;gap:3px;flex-wrap:wrap}
+.cc-chk{position:absolute;top:7px;right:8px;font-size:12px;color:var(--green2)}
+.cc-lck{position:absolute;top:7px;right:8px;font-size:10px;color:var(--ink3)}
+
+/* ── DIFFICULTY SLIDER ── */
+.diff-wrap{padding:3px 0 6px}
+.diff-labels{display:flex;justify-content:space-between;font-size:7px;color:var(--ink3);margin-bottom:4px}
+input[type=range]{width:100%;-webkit-appearance:none;height:3px;background:var(--line2);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;
+  border-radius:50%;background:var(--gold2);border:2px solid var(--bg2)}
+.diff-val{font-size:15px;font-weight:900;margin-top:5px}
+.diff-sub{font-size:8px;color:var(--ink3);margin-top:2px;line-height:1.5}
+
+/* ── ADJUSTMENT CARDS ── */
+.adj{border:1px solid var(--line2);padding:6px 9px;margin-bottom:3px;
+  display:flex;align-items:flex-start;gap:7px;cursor:pointer;background:var(--bg3)}
+.adj.adv{border-left:2px solid var(--green2)}
+.adj.dis{border-left:2px solid var(--red2)}
+.adj.on.adv{background:rgba(42,104,48,.13);border-color:var(--green2)}
+.adj.on.dis{background:rgba(184,40,32,.13);border-color:var(--red2)}
+.adj-chk{width:15px;height:15px;border:1px solid var(--line2);flex-shrink:0;margin-top:1px;
+  display:flex;align-items:center;justify-content:center;font-size:9px}
+.adj.on.adv .adj-chk{background:var(--green2);border-color:var(--green2);color:#000}
+.adj.on.dis .adj-chk{background:var(--red2);border-color:var(--red2);color:#fff}
+.adj-n{font-size:9px;font-weight:700;color:var(--ink)}
+.adj-d{font-size:7px;color:var(--ink3);margin-top:1px;line-height:1.4}
+
+/* ── ALWAYS-ON RULES ── */
+.rule-on{border:1px solid rgba(200,149,42,.25);border-left:2px solid var(--gold);
+  padding:6px 9px;margin-bottom:3px;background:var(--bg3)}
+.rule-n{font-size:9px;font-weight:700;color:var(--gold2);margin-bottom:2px;display:flex;align-items:center;gap:6px}
+.rule-badge{font-size:6px;font-weight:700;letter-spacing:1px;
+  background:var(--gd);color:var(--gold);border:1px solid rgba(200,149,42,.3);padding:1px 4px}
+.rule-d{font-size:7px;color:var(--ink3);line-height:1.5}
+
+/* ── LOCKED OPTIONAL RULE ── */
+.rule-lock{border:1px solid var(--line);padding:6px 9px;margin-bottom:3px;
+  display:flex;align-items:center;gap:7px;background:var(--bg3);opacity:.38}
+.rule-lock-info{flex:1}
+.rule-lock-n{font-size:9px;font-weight:700;color:var(--ink2)}
+.rule-lock-d{font-size:7px;color:var(--ink3);margin-top:1px;line-height:1.3}
+.soon{font-size:6px;letter-spacing:1px;color:var(--ink3);
+  background:var(--bg4);border:1px solid var(--line);padding:1px 4px;flex-shrink:0}
+
+/* ── PILOT BROWSER ── */
+.fbar{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:5px;align-items:center}
+select.fs{background:var(--bg3);border:1px solid var(--line2);color:var(--ink);
+  padding:4px 5px;font-size:8px;-webkit-appearance:none;flex:1;min-width:65px}
+.srt{background:var(--bg3);border:1px solid var(--line2);color:var(--ink2);
+  padding:3px 7px;font-size:7px;letter-spacing:1px;flex-shrink:0}
+.srt.on{border-color:var(--gold);color:var(--gold2);background:var(--gd)}
+
+/* ── PILOT CARD ── */
+.pc{background:var(--bg3);border:1px solid var(--line2);border-left:3px solid var(--line2);
+  margin-bottom:4px;overflow:hidden}
+.pc.inq{border-left-color:var(--green2)}
+.pc.exp{border-color:var(--gold)}
+.pc-h{display:flex;align-items:center;gap:6px;padding:6px 8px;cursor:pointer}
+.pc-h:active{background:var(--bg4)}
+.pc-n{font-size:11px;font-weight:800;color:var(--ink);flex:1;min-width:0}
+.pc-sub{display:flex;gap:3px;flex-wrap:wrap;margin-top:2px;align-items:center}
+.pc-btn{padding:3px 8px;font-size:7px;font-weight:700;letter-spacing:1px;border:1px solid;flex-shrink:0}
+.pc-btn.add{border-color:var(--green);color:var(--green2);background:none}
+.pc-btn.rem{border-color:var(--red);color:var(--red2);background:none}
+
+/* ── RANK STAT GRID ── */
+.rg{display:grid;grid-template-columns:68px repeat(9,1fr);gap:2px;padding:0 7px 7px}
+.rgh{background:var(--bg2);border:1px solid var(--line);padding:2px;
+  text-align:center;font-size:6px;letter-spacing:.3px;color:var(--ink3)}
+.rgh.ln{text-align:left;font-size:7px}
+.rgc{background:var(--bg);border:1px solid var(--line);padding:2px;
+  text-align:center;font-size:8px;font-weight:700;color:var(--ink)}
+.rgc.ln{text-align:left;background:var(--bg2);font-size:7px;font-weight:400;color:var(--ink2)}
+.rgc.hi{background:rgba(200,149,42,.1);border-color:var(--gold)}
+.p{color:var(--green2)}.n{color:var(--red2)}.z{color:var(--ink3)}
+.go{color:var(--gold2)}.bl{color:var(--blue2)}
+/* rank-coloured name cells */
+.cN{color:var(--rk-N)}.cG{color:var(--rk-G)}.cA{color:var(--rk-A)}
+.cS{color:var(--rk-S)}.cV{color:var(--rk-V)}.cX{color:var(--rk-X)}
+
+/* ── SQUAD SLOTS ── */
+.sq{display:flex;align-items:center;gap:6px;padding:5px 8px;
+  border:1px solid var(--line2);border-left:3px solid var(--line);margin-bottom:3px;background:var(--bg3)}
+.sq.ok{border-left-color:var(--green2)}.sq.sh{border-left-color:var(--red2)}
+.sq-r{font-size:7px;letter-spacing:1.5px;width:44px;flex-shrink:0}
+.sq-info{flex:1;min-width:0}
+.sq-n{font-size:10px;font-weight:700;color:var(--ink)}
+.sq-d{font-size:7px;color:var(--ink3);margin-top:1px}
+
+/* ── PRECAMP PILOT ── */
+.pm{border:1px solid var(--line2);border-left:3px solid var(--green2);
+  padding:7px 9px;margin-bottom:4px;background:var(--bg3)}
+.pm-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.pm-n{font-size:11px;font-weight:800;color:var(--ink)}
+.pm-stats{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:3px}
+.pst{background:var(--bg);border:1px solid var(--line);padding:1px 5px;font-size:7px;color:var(--ink2)}
+.pst b{color:var(--ink)}
+.xpr{display:flex;align-items:center;gap:5px;font-size:7px;color:var(--ink3);margin-top:3px}
+.xpb{flex:1;height:2px;background:var(--line)}
+.xpf{height:100%;background:var(--gold)}
+.prom-hist{font-size:7px;color:var(--pu2);margin-top:3px}
+
+/* ── SO POOL ── */
+.so-pool{border:1px solid rgba(200,149,42,.3);border-left:3px solid var(--gold);
+  padding:8px 10px;margin-bottom:7px;background:var(--bg3)}
+.so-n{font-size:24px;font-weight:900;color:var(--gold2);line-height:1}
+.so-l{font-size:7px;letter-spacing:2px;color:var(--ink3);margin-top:1px}
+
+/* ── MISSION SCREENS ── */
+.zone-row{display:flex;gap:6px;margin-bottom:10px}
+.zone{flex:1;background:var(--bg3);border:1px solid var(--line2);padding:10px 10px 12px;min-height:160px;position:relative}
+.zone-t{font-size:7px;font-weight:700;letter-spacing:2.5px;color:var(--gold);
+  margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+.threat-counter{background:var(--bg4);border:1px solid var(--line2);border-left:3px solid var(--red2);
+  padding:5px 8px;margin-bottom:3px;font-size:9px;display:flex;align-items:center;gap:6px}
+.tc-icon{font-size:14px;flex-shrink:0}
+.tc-info{flex:1}
+.tc-n{font-size:9px;font-weight:700;color:var(--ink)}
+.tc-d{font-size:7px;color:var(--ink3)}
+.tc-status{font-size:7px;font-weight:700}
+.tc-status.act{color:var(--red2)}.tc-status.dam{color:var(--amber2)}.tc-status.des{color:var(--ink3)}
+/* Aircraft token */
+.ac-token{background:var(--bg4);border:1px solid var(--blue2);border-left:3px solid var(--blue2);
+  padding:5px 8px;margin-bottom:3px;display:flex;align-items:center;gap:6px;cursor:pointer}
+.ac-token:active{background:var(--bg2)}
+.ac-token.low-alt{border-left-color:var(--green2)}
+.ac-token.high-alt{border-left-color:var(--blue2)}
+.ac-token.attacking{border-left-color:var(--red2);background:rgba(184,40,32,.07)}
+.ac-token.shaken{border-left-color:var(--amber2)}
+.ac-token.sar{border-left-color:var(--ink3);opacity:.5}
+.act-ico{font-size:16px;flex-shrink:0}
+.act-n{font-size:10px;font-weight:800;color:var(--ink)}
+.act-d{font-size:7px;color:var(--ink3);margin-top:1px}
+/* Target card */
+.tgt-card{border:1px solid var(--gold);border-left:3px solid var(--gold);
+  padding:9px 11px;margin-bottom:5px;cursor:pointer;background:var(--bg3);position:relative}
+.tgt-card:active{background:var(--bg4)}
+.tgt-card.sel{background:rgba(200,149,42,.07)}
+.tgt-n{font-size:12px;font-weight:800;color:var(--gold2)}
+.tgt-vp{position:absolute;top:8px;right:9px;font-size:10px;font-weight:900;color:var(--gold2)}
+.tgt-stats{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:6px}
+.tgt-flags{display:flex;gap:3px;flex-wrap:wrap;margin-top:5px}
+
+/* ── WEAPON LOAD ── */
+.wg{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin:5px 0}
+.wb{background:var(--bg);border:1px solid var(--line2);padding:5px 7px;
+  cursor:pointer;text-align:left}
+.wb.sel{border-color:var(--gold);background:var(--gd)}
+.wb.ata{border-left:2px solid var(--blue2)}.wb.atg{border-left:2px solid var(--amber2)}
+.wb-n{font-size:9px;font-weight:700;color:var(--ink)}
+.wb-d{font-size:7px;color:var(--ink3);margin-top:1px;font-family:monospace}
+
+/* ── TABS ── */
+.tabs{display:flex;border-bottom:1px solid var(--line);margin-bottom:8px}
+.tab{padding:5px 11px;font-size:7px;font-weight:700;letter-spacing:2px;
+  color:var(--ink3);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+.tab.on{color:var(--gold2);border-bottom-color:var(--gold)}
+
+/* ── MODAL ── */
+.mbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);
+  z-index:100;align-items:center;justify-content:center}
+.mbg.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--line2);border-top:2px solid var(--gold);
+  width:460px;max-height:80vh;overflow-y:auto;padding:13px 12px 22px}
+.mtt{font-size:9px;font-weight:700;letter-spacing:2px;color:var(--gold);
+  margin-bottom:11px;display:flex;align-items:center;justify-content:space-between}
+.mx{background:none;border:none;color:var(--ink3);font-size:19px;line-height:1}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:56px;left:50%;transform:translateX(-50%);
+  background:var(--bg3);border:1px solid var(--gold);color:var(--ink);
+  padding:6px 15px;font-size:8px;font-weight:700;z-index:500;display:none;max-width:280px;text-align:center}
+#toast.on{display:block;animation:tp .18s ease}
+@keyframes tp{from{opacity:0;bottom:44px}to{opacity:1;bottom:56px}}
+
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:1px}
+select{background:var(--bg3);border:1px solid var(--line2);color:var(--ink);padding:6px;width:100%;font-size:11px;-webkit-appearance:none}
+.shell.in-campaign .abar{display:none}
+.shell.in-campaign{grid-template-rows:44px 1fr}
+
+/* ── CAMPAIGN MAP SCREEN ── */
+.camp-screen{grid-column:1/-1;width:100%;height:100%;overflow:hidden;display:flex;flex-direction:column;background:linear-gradient(160deg,#1a140c,#0e0b07)}
+.map-layout{flex:1;display:grid;grid-template-columns:230px 1fr 190px;overflow:hidden;min-height:0}
+.map-info-panel{background:linear-gradient(160deg,#2a2015,#1a1610);border-right:2px solid #4a3a20;
+  padding:10px 11px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.map-info-title{font-size:13px;font-weight:900;letter-spacing:1px;color:#f0e0c0}
+.map-info-sub{font-size:8px;letter-spacing:1.5px;color:var(--gold2);font-weight:700}
+.map-info-desc{font-size:8px;color:#c0b090;line-height:1.6}
+.map-rules-box{background:rgba(0,0,0,.25);border:1px solid #4a3a20;padding:7px 8px;border-radius:2px}
+.map-rule{font-size:7.5px;color:#d0c0a0;line-height:1.6;margin-bottom:5px}
+.map-rule:last-child{margin-bottom:0}
+.map-rule b{color:var(--gold2)}
+.us-avail{display:inline-block;font-size:6px;letter-spacing:1px;font-weight:700;
+  background:rgba(72,168,88,.2);color:var(--green2);border:1px solid rgba(72,168,88,.4);
+  padding:1px 4px;margin-top:2px}
+.us-used{display:inline-block;font-size:6px;letter-spacing:1px;font-weight:700;
+  background:rgba(224,56,48,.2);color:var(--red2);border:1px solid rgba(224,56,48,.4);
+  padding:1px 4px;margin-top:2px}
+.map-day-box{background:rgba(0,0,0,.25);border:1px solid #4a3a20;padding:7px 8px}
+.map-day-lbl{font-size:7px;letter-spacing:2px;color:var(--gold);margin-bottom:5px;font-weight:700}
+.map-day-track{display:flex;gap:3px;margin-bottom:5px}
+.map-day-pip{flex:1;height:22px;border:1px solid #4a3a20;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#8a7a5a}
+.map-day-pip.past{background:var(--gold);border-color:var(--gold);color:#000}
+.map-day-pip.cur{border-color:var(--gold2);color:var(--gold2);box-shadow:0 0 0 1px var(--gold2) inset}
+.map-day-detail{font-size:8px;color:#c0b090;text-align:center}
+.map-vp-row{display:flex;gap:6px}
+.map-vp-box{flex:1;background:rgba(0,0,0,.25);border:1px solid #4a3a20;padding:8px;text-align:center}
+.map-vp-n{font-size:22px;font-weight:900;color:var(--gold2);line-height:1}
+.map-vp-l{font-size:7px;letter-spacing:2px;color:#8a7a5a;margin-top:2px}
+
+.map-center{overflow:hidden;display:flex;align-items:center;justify-content:center;padding:8px;position:relative}
+.map-canvas-wrap{width:100%;height:100%;max-width:100%;max-height:100%;display:flex;align-items:center;justify-content:center}
+.map-svg{width:100%;height:100%;max-height:100%}
+.stress-lbl{fill:#c04030;font-size:15px;font-weight:900;font-family:inherit}
+.country-lbl{fill:#8a9088;font-size:13px;font-weight:700;letter-spacing:1px;font-family:inherit}
+.tgt-pin{cursor:pointer}
+.tgt-pin-circle{fill:#1a1a1a;stroke:var(--gold2);stroke-width:2}
+.tgt-pin-circle.longpress-hl{fill:#c02020;stroke:#ff4040;stroke-width:4;animation:pinpulse .6s ease-in-out infinite alternate}
+@keyframes pinpulse{from{r:16}to{r:22}}
+.tgt-pin-circle.attacked{fill:#2a4a2a;stroke:var(--green2)}
+.tgt-pin-circle.selected{fill:var(--gold);stroke:#fff;stroke-width:3}
+.tgt-pin-text{fill:var(--gold2);font-size:13px;font-weight:900;text-anchor:middle;dominant-baseline:central;font-family:inherit;pointer-events:none}
+.tgt-pin-circle.selected + .tgt-pin-text{fill:#000}
+
+.map-ref-panel{background:linear-gradient(160deg,#2a2015,#1a1610);border-left:2px solid #4a3a20;
+  padding:10px 11px;overflow-y:auto}
+.map-ref-title{font-size:9px;font-weight:900;letter-spacing:2px;color:var(--gold2);margin-bottom:6px}
+.map-ref-col{display:flex;flex-direction:column;gap:3px}
+.map-ref-sub{font-size:7px;letter-spacing:1.5px;color:#8a7a5a;font-weight:700;margin-top:3px}
+.map-ref-item{font-size:8px;color:#c0b090;line-height:1.5;padding-left:6px;border-left:2px solid #4a3a20}
+.track-strip{display:flex;flex-direction:column;gap:5px}
+.track-mini{background:rgba(0,0,0,.25);border:1px solid #4a3a20;padding:5px 7px}
+.track-mini-t{font-size:7px;letter-spacing:1.5px;font-weight:700;margin-bottom:3px}
+.track-mini-v{font-size:14px;font-weight:900;color:var(--gold2)}
+
+/* Bottom target strip */
+.target-strip{flex-shrink:0;background:linear-gradient(180deg,#221c12,#1a1610);
+  border-top:2px solid var(--gold);padding:8px 12px;max-height:170px;overflow-y:auto}
+.ts-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.ts-title{font-size:9px;font-weight:900;letter-spacing:2px;color:var(--gold2)}
+.ts-sub{font-size:8px;color:#8a7a5a}
+.ts-cards{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.ts-card{flex-shrink:0;width:190px;background:var(--bg3);border:1px solid var(--line2);
+  border-top:3px solid var(--gold);padding:8px 9px;cursor:pointer}
+.ts-card:active{background:var(--bg4)}
+.ts-card.sel{border-top-color:var(--green2);background:rgba(42,104,48,.08)}
+.ts-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.ts-card-n{font-size:10px;font-weight:800;color:var(--gold2)}
+.ts-card-vp{font-size:11px;font-weight:900;color:var(--gold2)}
+.ts-card-stats{display:flex;gap:4px;flex-wrap:wrap;font-size:7px;color:#8a7a5a}
+.ts-card-flags{display:flex;gap:2px;flex-wrap:wrap;margin-top:4px}
+
+/* Target detail screen */
+.target-detail-layout{flex:1;display:grid;grid-template-columns:1fr 320px;overflow:hidden}
+.td-map-side{background:linear-gradient(160deg,#1a140c,#0e0b07);display:flex;align-items:center;justify-content:center;padding:16px}
+.td-info-side{display:flex;flex-direction:column;overflow:hidden;background:var(--bg2);border-left:1px solid var(--line2)}
+
+/* Seed / Arm two-panel layout */
+.seed-layout{flex:1;display:grid;grid-template-columns:320px 1fr;overflow:hidden}
+.seed-layout .lp{border-right:1px solid var(--line2)}
+.td-card{padding:12px 14px}
+.td-row{font-size:14px;padding:7px 0}
+.td-row .rl{font-size:13px}
+.td-row .rv{font-size:14px}
+#target-detail-body{padding:16px 18px}
+</style>
+</head>
+<body>
+<div id="toast"></div>
+<div class="shell" id="shell">
+
+<!-- ████ TOPBAR — SETUP MODE ████ -->
+<div class="topbar" id="topbar-setup">
+  <div class="tb-logo">
+    <div><div class="logo-iaf">IAF</div><div class="logo-sub">LEADER</div></div>
+  </div>
+  <div class="tb-steps" id="tb-steps">
+    <div class="step on"   id="stp1" onclick="gotoStep(1)"><div class="step-n">1</div>CAMPAIGN</div>
+    <div class="step"      id="stp2" onclick="gotoStep(2)"><div class="step-n">2</div>SQUADRON</div>
+    <div class="step"      id="stp3" onclick="gotoStep(3)"><div class="step-n">3</div>PRE-CAMPAIGN</div>
+  </div>
+</div>
+
+<!-- ████ TOPBAR — CAMPAIGN MODE ████ -->
+<div class="topbar" id="topbar-camp" style="display:none">
+  <div class="tb-logo" style="cursor:pointer" onclick="gotoMissionScreen('map')">
+    <div><div class="logo-iaf">IAF</div><div class="logo-sub">LEADER</div></div>
+  </div>
+  <div class="tb-steps" id="camp-nav">
+    <div class="step on" id="cn-map" onclick="gotoMissionScreen('map')"><div class="step-n">◈</div>CAMPAIGN MAP</div>
+    <div class="step" id="cn-tgt" onclick="gotoMissionScreen('target')" style="display:none"><div class="step-n">◎</div>TARGET</div>
+    <div class="step" id="cn-seed" onclick="gotoMissionScreen('seed')" style="display:none"><div class="step-n">▦</div>SEED SITES</div>
+    <div class="step" id="cn-arm" onclick="gotoMissionScreen('arm')" style="display:none"><div class="step-n">✈</div>ARM AIRCRAFT</div>
+  </div>
+  <div class="tb-right" id="tb-right">
+    <div class="chip">DAY <b id="ch-day">1</b>/<b id="ch-totaldays">3</b></div>
+    <div class="chip">VP <b id="ch-vp">0</b></div>
+    <div class="chip">SO <b id="ch-so">22</b></div>
+  </div>
+</div>
+
+<!-- ████ SETUP STEP 1 ████ -->
+<div id="p1L" class="lp">
+  <div class="ph"><div class="ph-t">Campaign</div></div>
+  <div class="pb">
+    <div class="sl">Select Scenario</div>
+    <div class="cc sel" id="cc-ds" onclick="selCamp('ds')">
+      <div class="cc-chk" id="cc-ds-mk">✓</div>
+      <div class="cc-n">Desert Storm</div>
+      <div class="cc-y">ISRAEL · IRAQ · 1991</div>
+      <div class="cc-d">After SCUD attacks on Israeli cities, the IAF launched retaliatory strikes against Iraq with aerial refuelling support from American KC-135 Stratotankers.</div>
+      <div class="cc-tags"><span class="bdg bGr">Available</span><span class="bdg bX">Introductory</span><span class="bdg bA">1991</span></div>
+    </div>
+    <div class="cc locked"><div class="cc-lck">🔒</div><div class="cc-n">Yom Kippur War</div><div class="cc-y">ISRAEL · EGYPT · SYRIA · 1973</div><div class="cc-d">Two-front surprise attack. Hold the line.</div><div class="cc-tags"><span class="bdg bX">Coming Soon</span><span class="bdg bX">Advanced</span></div></div>
+    <div class="cc locked"><div class="cc-lck">🔒</div><div class="cc-n">Operation Opera</div><div class="cc-y">ISRAEL · IRAQ · 1981</div><div class="cc-d">Long-range strike on the Osirak nuclear reactor.</div><div class="cc-tags"><span class="bdg bX">Coming Soon</span><span class="bdg bX">Expert</span></div></div>
+    <div class="sl">Campaign Length</div>
+    <div class="card">
+      <div class="opts" id="len-g">
+        <div class="op sel" data-val="short"  onclick="pop(this,'len-g');upLen()">Short — 3 Days</div>
+        <div class="op"     data-val="medium" onclick="pop(this,'len-g');upLen()">Medium — 6 Days</div>
+        <div class="op"     data-val="long"   onclick="pop(this,'len-g');upLen()">Long — 9 Days</div>
+      </div>
+      <div class="row mt4"><span class="rl">Starting SO</span><span class="rv y" id="l-so">22</span></div>
+      <div class="row"><span class="rl">Pilots required</span><span class="rv" id="l-pil">8</span></div>
+      <div class="row"><span class="rl">Promotion cost</span><span class="rv" id="l-prom">6 SO/rank</span></div>
+    </div>
+  </div>
+</div>
+
+<div id="p1R" class="rp">
+  <div class="ph"><div class="ph-t">Difficulty & Rules</div></div>
+  <div class="pb">
+    <div class="sl">Campaign Difficulty</div>
+    <div class="card mb6">
+      <div class="diff-wrap">
+        <div class="diff-labels">
+          <span>Newbie</span><span>Green</span><span>Average</span><span>Skilled</span><span>Veteran</span><span>Ace</span>
+        </div>
+        <input type="range" id="diff-sl" min="0" max="5" value="2" oninput="upDiff()">
+        <div class="diff-val" id="diff-val" style="color:var(--rk-A)">Average</div>
+        <div class="diff-sub" id="diff-sub">Standard play. No adjustments.</div>
+      </div>
+    </div>
+    <div id="adj-wrap" style="display:none">
+      <div class="sl" id="adj-title">Select Adjustments</div>
+      <div id="adj-list"></div>
+      <button class="btn btn-x sm mt4 full" onclick="randAdj()">🎲 Randomise</button>
+    </div>
+    <div class="sl">Desert Storm — Always Active</div>
+    <div class="rule-on"><div class="rule-n">Limited Ordnance <span class="rule-badge">ALWAYS ON</span></div><div class="rule-d">Cannot arm more than 10 AIM-7/9/120s per campaign day across all aircraft.</div></div>
+    <div class="rule-on"><div class="rule-n">A-4 Skyhawk Bonus <span class="rule-badge">ALWAYS ON</span></div><div class="rule-d">Gain +1/+2/+3 SO (Short/Medium/Long) for each A-4 Skyhawk pilot in your squadron.</div></div>
+    <div class="rule-on"><div class="rule-n">US Support <span class="rule-badge">ALWAYS ON</span></div><div class="rule-d">Once per campaign, discard a drawn Escalation card without suffering its effect.</div></div>
+    <div class="sl">Optional Rules <span style="font-size:7px;color:var(--ink3);letter-spacing:1px;font-weight:400">— Future update</span></div>
+    <div class="rule-lock"><span style="font-size:11px">🔒</span><div class="rule-lock-info"><div class="rule-lock-n">Night Missions</div><div class="rule-lock-d">Randomised activation order each turn. +SO on success.</div></div><div class="soon">SOON</div></div>
+    <div class="rule-lock"><span style="font-size:11px">🔒</span><div class="rule-lock-info"><div class="rule-lock-n">Flying ±1 Aircraft</div><div class="rule-lock-d">+1 aircraft (−1 VP) or −1 aircraft (+1 VP if successful). Costs 3/6/9 SO.</div></div><div class="soon">SOON</div></div>
+    <div class="rule-lock"><span style="font-size:11px">🔒</span><div class="rule-lock-info"><div class="rule-lock-n">High Stress Attacks</div><div class="rule-lock-d">+1 all rolls this turn, +1 Stress. Once per turn. Costs 3/6/9 SO.</div></div><div class="soon">SOON</div></div>
+    <div class="rule-lock"><span style="font-size:11px">🔒</span><div class="rule-lock-info"><div class="rule-lock-n">Successful AtA Cannon Attacks</div><div class="rule-lock-d">+1 XP for destroying a Bandit with Cannon. Costs 1/2/3 SO.</div></div><div class="soon">SOON</div></div>
+    <div class="rule-lock"><span style="font-size:11px">🔒</span><div class="rule-lock-info"><div class="rule-lock-n">Damaging Targets</div><div class="rule-lock-d">Score ≥ half hits to Damage. Gain half VP. Costs 3/6/9 SO.</div></div><div class="soon">SOON</div></div>
+    <div class="rule-lock"><span style="font-size:11px">🔒</span><div class="rule-lock-info"><div class="rule-lock-n">Damaged Sites</div><div class="rule-lock-d">Sites can be Damaged but not Destroyed. Costs 3/6/9 SO.</div></div><div class="soon">SOON</div></div>
+    <div class="rule-lock"><span style="font-size:11px">🔒</span><div class="rule-lock-info"><div class="rule-lock-n">Random Squadron Selection</div><div class="rule-lock-d">Randomly determine pilots from cup. Gain 6/12/18 SO.</div></div><div class="soon">SOON</div></div>
+  </div>
+</div>
+
+<!-- ████ SETUP STEP 2 ████ -->
+<div id="p2L" class="lp" style="display:none">
+  <div class="ph"><div class="ph-t">My Squadron</div><div class="ph-s" id="s2-sub">0 pilots</div></div>
+  <div class="pb">
+    <div class="sl">Required Slots</div>
+    <div id="slot-view"></div>
+    <div class="sl">Selected Pilots</div>
+    <div id="squad-list"></div>
+    <div class="sm dim ctr" id="squad-empty" style="padding:12px;display:none">Use browser → to add pilots</div>
+  </div>
+</div>
+<div id="p2R" class="rp" style="display:none">
+  <div class="ph">
+    <div class="ph-t">Pilot Browser</div>
+    <div class="flex gap4">
+      <button class="srt on" id="sb-name" onclick="setSort('name')">Name</button>
+      <button class="srt" id="sb-ata"  onclick="setSort('ata')">ATA↓</button>
+      <button class="srt" id="sb-atg"  onclick="setSort('atg')">ATG↓</button>
+      <button class="srt" id="sb-cool" onclick="setSort('cool')">Cool↓</button>
+      <button class="srt" id="sb-sa"   onclick="setSort('sa')">SA↓</button>
+    </div>
+  </div>
+  <div class="pb">
+    <div class="fbar">
+      <select class="fs" id="f-ac"   onchange="renderBrowser()"><option value="">All Aircraft</option><option>C2 Kfir</option><option>F-4 Phantom</option><option>F-16 Fighting Falcon</option><option>F-15A Eagle</option><option>A-4 Skyhawk</option></select>
+      <select class="fs" id="f-rank" onchange="renderBrowser()"><option value="">All Ranks</option><option>Newbie</option><option>Green</option><option>Average</option><option>Skilled</option><option>Veteran</option><option>Ace</option></select>
+      <select class="fs" id="f-ata"  onchange="renderBrowser()"><option value="">ATA: Any</option><option value="-1">−1+</option><option value="0">0+</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option></select>
+      <select class="fs" id="f-atg"  onchange="renderBrowser()"><option value="">ATG: Any</option><option value="0">0+</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option></select>
+      <select class="fs" id="f-cool" onchange="renderBrowser()"><option value="">Cool: Any</option><option value="1">1+</option><option value="2">2+</option></select>
+      <select class="fs" id="f-sa"   onchange="renderBrowser()"><option value="">SA: Any</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option></select>
+    </div>
+    <div class="tiny dim mb4" id="br-cnt"></div>
+    <div id="browser-list"></div>
+  </div>
+</div>
+
+<!-- ████ SETUP STEP 3 ████ -->
+<div id="p3L" class="lp" style="display:none">
+  <div class="ph"><div class="ph-t">SO Points</div></div>
+  <div class="pb">
+    <div class="so-pool">
+      <div class="fb">
+        <div><div class="so-n" id="so-n">22</div><div class="so-l">SPECIAL OPINION POINTS</div></div>
+        <div style="text-align:right;font-size:7px;color:var(--ink3)">
+          Promote: <span style="color:var(--gold2)" id="pc-lbl">6</span> SO/rank<br>
+          <span style="font-size:7px;color:var(--ink3)">Only way to start as Veteran or Ace</span>
+        </div>
+      </div>
+    </div>
+    <div class="sl">Promotions</div>
+    <div id="promo-list"></div>
+    <div class="sl">Skills <span style="font-size:7px;color:var(--ink3);font-weight:400;letter-spacing:1px">— Expansion, coming soon</span></div>
+    <div class="rule-lock" style="opacity:.35"><span style="font-size:11px">🔒</span><div class="rule-lock-info"><div class="rule-lock-n">Pilot Skills</div><div class="rule-lock-d">Purchase specialised skills for pilots. Costs 1/2/3 SO per skill.</div></div><div class="soon">SOON</div></div>
+  </div>
+</div>
+<div id="p3R" class="rp" style="display:none">
+  <div class="ph"><div class="ph-t">Squadron Stats</div></div>
+  <div class="pb">
+    <div class="tabs">
+      <div class="tab on" onclick="stab(this,'s3t1','s3t2')">Pilots</div>
+      <div class="tab" onclick="stab(this,'s3t2','s3t1');renderSum()">Summary</div>
+    </div>
+    <div id="s3t1"><div id="precamp-pilots"></div></div>
+    <div id="s3t2" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
+        <div class="card">
+          <div class="sl" style="margin-top:0">Campaign Config</div>
+          <div class="row"><span class="rl">Scenario</span><span class="rv">Desert Storm</span></div>
+          <div class="row"><span class="rl">Length</span><span class="rv y" id="sm-len">Short</span></div>
+          <div class="row"><span class="rl">Difficulty</span><span class="rv" id="sm-diff">Average</span></div>
+          <div class="row"><span class="rl">Adjustments</span><span class="rv" id="sm-adj">None</span></div>
+          <div class="row"><span class="rl">SO remaining</span><span class="rv y" id="sm-so">22</span></div>
+        </div>
+        <div class="card">
+          <div class="sl" style="margin-top:0">Always Active</div>
+          <div class="row"><span class="rl">Limited Ordnance</span><span class="bdg bGr">On</span></div>
+          <div class="row"><span class="rl">A-4 Bonus</span><span class="bdg bGr">On</span></div>
+          <div class="row"><span class="rl">US Support</span><span class="bdg bGr">On</span></div>
+        </div>
+      </div>
+      <div class="sl">Final Squadron</div>
+      <div id="sm-squad"></div>
+      <button class="btn btn-g full mt8" onclick="beginCampaign()">▶ Begin Campaign — Day 1</button>
+    </div>
+  </div>
+</div>
+
+<!-- ████ CAMPAIGN MAP SCREEN ████ -->
+<div id="scr-map" class="camp-screen" style="display:none">
+  <div class="map-layout">
+    <!-- LEFT INFO PANEL -->
+    <div class="map-info-panel">
+      <div class="map-info-title" id="map-camp-title">1991: DESERT STORM</div>
+      <div class="map-info-sub">OVERVIEW — <span id="map-diff-label">INTRODUCTORY</span></div>
+      <div class="map-info-desc">After being repeatedly targeted by SCUD Rockets, Israel launched a counterattack against Iraq with the help of aerial refuelling from American KC-135 Stratotankers.</div>
+      <div class="map-rules-box">
+        <div class="map-rule"><b>Limited Ordnance:</b> Cannot Arm more than 10 AIM-7/9/120s per day.</div>
+        <div class="map-rule"><b>A-4 Skyhawk:</b> +1/2/3 SOs.</div>
+        <div class="map-rule"><b>U.S. Support:</b> Once during the Campaign, discard a drawn Escalation Card without suffering its effect. <span id="map-us-status" class="us-avail">AVAILABLE</span></div>
+      </div>
+      <div class="map-day-box">
+        <div class="map-day-lbl">CAMPAIGN DAY</div>
+        <div class="map-day-track" id="map-day-track"></div>
+        <div class="map-day-detail" id="map-day-detail">Day 1 of 3</div>
+      </div>
+      <div class="map-vp-row">
+        <div class="map-vp-box"><div class="map-vp-n" id="map-vp">0</div><div class="map-vp-l">VP</div></div>
+        <div class="map-vp-box"><div class="map-vp-n" id="map-so">22</div><div class="map-vp-l">SO</div></div>
+      </div>
+      <button class="btn btn-r full mt8" id="fly-mission-btn" onclick="startTargetDraw()">▶ Fly Mission — Draw Targets</button>
+    </div>
+
+    <!-- CENTER MAP -->
+    <div class="map-center">
+      <div class="map-canvas-wrap">
+        <svg viewBox="0 0 800 620" class="map-svg" id="map-svg">
+          <!-- Stress zone dividers -->
+          <line x1="430" y1="10" x2="430" y2="610" stroke="#5a4a30" stroke-width="2" stroke-dasharray="6,4"/>
+          <line x1="590" y1="10" x2="590" y2="610" stroke="#5a4a30" stroke-width="2" stroke-dasharray="6,4"/>
+          <text x="220" y="30" class="stress-lbl">STRESS: 1</text>
+          <text x="500" y="30" class="stress-lbl">STRESS: 2</text>
+          <text x="650" y="30" class="stress-lbl">STRESS: 3 +1XP</text>
+          <!-- Iraq outline with internal detail -->
+          <path d="M 180 90 L 420 60 L 560 80 L 610 140 L 640 220 L 620 320 L 600 420 L 560 500 L 480 560 L 380 570 L 280 540 L 220 460 L 180 380 L 160 260 L 170 160 Z"
+            fill="#4a5a48" stroke="#c04030" stroke-width="3" opacity="0.95"/>
+          <!-- Tigris & Euphrates rivers -->
+          <path d="M 320 90 Q 340 180 380 260 Q 420 340 400 420 Q 390 480 420 550" fill="none" stroke="#3868a0" stroke-width="3" opacity="0.7"/>
+          <path d="M 250 130 Q 300 220 360 280 Q 430 340 470 420 Q 500 470 480 550" fill="none" stroke="#3868a0" stroke-width="3" opacity="0.7"/>
+          <!-- Terrain texture — desert/mountain hints -->
+          <circle cx="230" cy="150" r="3" fill="#8a8060" opacity=".5"/><circle cx="260" cy="170" r="2" fill="#8a8060" opacity=".5"/>
+          <circle cx="500" cy="120" r="3" fill="#7a8a70" opacity=".5"/><circle cx="540" cy="140" r="2" fill="#7a8a70" opacity=".5"/>
+          <circle cx="220" cy="480" r="3" fill="#8a8060" opacity=".5"/><circle cx="250" cy="500" r="2" fill="#8a8060" opacity=".5"/>
+          <path d="M 480 90 L 620 220" stroke="#6a7a60" stroke-width="1" opacity=".4" stroke-dasharray="2,3"/>
+          <path d="M 200 350 L 350 470" stroke="#6a7a60" stroke-width="1" opacity=".4" stroke-dasharray="2,3"/>
+          <!-- Region labels inside Iraq -->
+          <text x="240" y="230" class="region-lbl">WESTERN DESERT</text>
+          <text x="480" y="180" class="region-lbl">NORTHERN IRAQ</text>
+          <text x="380" y="500" class="region-lbl">SOUTHERN IRAQ</text>
+          <text x="60" y="330" class="country-lbl">SYRIA</text>
+          <text x="60" y="600" class="country-lbl">SAUDI ARABIA</text>
+          <text x="640" y="150" class="country-lbl">IRAN</text>
+          <text x="640" y="70" class="country-lbl">TURKEY</text>
+          <text x="720" y="580" class="country-lbl">KUWAIT</text>
+          <g id="target-pins"></g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- RIGHT REFERENCE PANEL -->
+    <div class="map-ref-panel">
+      <div class="map-ref-title">WEAPONS</div>
+      <div class="map-ref-col">
+        <div class="map-ref-sub">STANDARD</div>
+        <div class="map-ref-item">Mk.82/83/84 Iron Bombs</div>
+        <div class="map-ref-item">M117R / M118 Bombs</div>
+        <div class="map-ref-item">CBU · Rockets</div>
+        <div class="map-ref-item">AIM-7 · AIM-9</div>
+        <div class="map-ref-item">Fuel Tanks · ECM Pods</div>
+        <div class="map-ref-sub mt8">SPECIAL</div>
+        <div class="map-ref-item">AGM-65 Maverick</div>
+        <div class="map-ref-item">AGM-78 ARM</div>
+        <div class="map-ref-item">GBU-10/12/16</div>
+        <div class="map-ref-item">Python</div>
+      </div>
+      <div class="map-ref-title mt12">TRACKS</div>
+      <div class="track-strip" id="track-strip"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM TARGET STRIP -->
+  <div class="target-strip" id="target-strip" style="display:none">
+    <div class="ts-header">
+      <span class="ts-title">DRAWN TARGETS — Day <span id="ts-day">1</span></span>
+      <span class="ts-sub" id="ts-sub">Select a target to attack</span>
+    </div>
+    <div class="ts-cards" id="ts-cards"></div>
+  </div>
+</div>
+
+<!-- ████ TARGET DETAIL SCREEN ████ -->
+<div id="scr-target" class="camp-screen" style="display:none">
+  <div class="target-detail-layout">
+    <div class="td-map-side">
+      <svg viewBox="0 0 800 620" class="map-svg">
+        <line x1="430" y1="10" x2="430" y2="610" stroke="#5a4a30" stroke-width="2" stroke-dasharray="6,4"/>
+        <line x1="590" y1="10" x2="590" y2="610" stroke="#5a4a30" stroke-width="2" stroke-dasharray="6,4"/>
+        <path d="M 180 90 L 420 60 L 560 80 L 610 140 L 640 220 L 620 320 L 600 420 L 560 500 L 480 560 L 380 570 L 280 540 L 220 460 L 180 380 L 160 260 L 170 160 Z"
+          fill="#6a7a68" stroke="#c04030" stroke-width="3" opacity="0.85"/>
+        <g id="target-detail-pin"></g>
+      </svg>
+    </div>
+    <div class="td-info-side">
+      <div class="ph"><div class="ph-t">Target Briefing</div></div>
+      <div class="pb" id="target-detail-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ████ SEED SITES SCREEN ████ -->
+<div id="scr-seed" class="camp-screen" style="display:none">
+  <div class="seed-layout">
+    <div class="lp">
+      <div class="ph"><div class="ph-t">Site & Bandit Seeding</div></div>
+      <div class="pb">
+        <div class="sl">Threat Counts</div>
+        <div class="card mb6">
+          <div class="row"><span class="rl">Approach Sites</span><span class="rv r" id="seed-sA">0</span></div>
+          <div class="row"><span class="rl">Approach Bandits</span><span class="rv a" id="seed-bA">0</span></div>
+          <div class="row"><span class="rl">Centre Sites</span><span class="rv r" id="seed-sC">0</span></div>
+          <div class="row"><span class="rl">Centre Bandits</span><span class="rv a" id="seed-bC">0</span></div>
+          <div class="row"><span class="rl">Intel modifier</span><span class="rv b" id="seed-intel">0</span></div>
+          <div class="row"><span class="rl">Difficulty modifier</span><span class="rv" id="seed-diff">0</span></div>
+        </div>
+        <div class="tiny dim mb6">Draw randomly to place. Bandits placed after Over-Target event card.</div>
+        <button class="btn btn-r full" onclick="seedThreats()">🎲 Draw & Place Threats</button>
+        <div class="sl mt8">Counter Pool</div>
+        <div id="pool-display"></div>
+      </div>
+    </div>
+    <div class="rp">
+      <div class="ph"><div class="ph-t">Tactical Layout</div></div>
+      <div class="pb">
+        <div class="zone-row">
+          <div class="zone">
+            <div class="zone-t">APPROACH AREA</div>
+            <div id="zone-app-sites"></div>
+          </div>
+          <div class="zone">
+            <div class="zone-t">CENTRE AREA</div>
+            <div id="zone-ctr-sites"></div>
+          </div>
+        </div>
+        <div class="tiny dim mb6">Bandits will be placed after the Over-Target event card.</div>
+        <button class="btn btn-y full" id="seed-next" style="display:none" onclick="goArm()">Arm Aircraft →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ████ ARM AIRCRAFT SCREEN ████ -->
+<div id="scr-arm" class="camp-screen" style="display:none">
+  <div class="seed-layout">
+    <div class="lp">
+      <div class="ph"><div class="ph-t">Arm Aircraft</div><div class="ph-s" id="arm-sub">Select pilot</div></div>
+      <div class="pb">
+        <div class="sl">Assign Pilots to Mission</div>
+        <div id="arm-pilots"></div>
+        <div class="sl">Altitude</div>
+        <div class="opts" id="alt-g">
+          <div class="op sel" data-val="low"  onclick="pop(this,'alt-g')">Low Altitude</div>
+          <div class="op"     data-val="high" onclick="pop(this,'alt-g')">High Altitude</div>
+        </div>
+        <div class="tiny dim mt4">Low: can use bombs/rockets. High: can use guided weapons.</div>
+      </div>
+    </div>
+    <div class="rp">
+      <div class="ph"><div class="ph-t">Weapon Load</div><div class="ph-s" id="arm-pilot-name">—</div></div>
+      <div class="pb">
+        <div id="arm-weapon-area"><div class="sm dim ctr" style="padding:16px">Select a pilot ← to arm</div></div>
+        <div id="arm-summary" class="mt8"></div>
+        <button class="btn btn-r full mt8" id="launch-btn" style="display:none" onclick="launchMission()">🚀 Launch Mission →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ACTION BAR -->
+<div class="abar">
+  <div class="abar-info" id="abar-info"></div>
+  <div style="display:flex;gap:6px">
+    <button class="btn btn-x sm" id="ab-back" style="display:none" onclick="prevStep()">← Back</button>
+    <button class="btn btn-g sm" id="ab-next" onclick="nextStep()">Next →</button>
+  </div>
+</div>
+
+</div><!-- shell -->
+
+<!-- PROMOTE MODAL -->
+<div class="mbg" id="mod-promo">
+<div class="modal">
+  <div class="mtt"><span id="pm-ttl">Promote</span><button class="mx" onclick="closeM('mod-promo')">✕</button></div>
+  <div id="pm-body"></div>
+</div>
+</div>
+<script>
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
+const RANKS=['Newbie','Green','Average','Skilled','Veteran','Ace'];
+const RK_CLS={Newbie:'rN',Green:'rG',Average:'rA',Skilled:'rS',Veteran:'rV',Ace:'rX'};
+const RK_COL={Newbie:'var(--rk-N)',Green:'var(--rk-G)',Average:'var(--rk-A)',Skilled:'var(--rk-S)',Veteran:'var(--rk-V)',Ace:'var(--rk-X)'};
+const DIFF_INFO=[
+  {label:'Newbie', col:'var(--rk-N)', sub:'Easiest. Select 2 Advantages.',  adv:2, dis:0},
+  {label:'Green',  col:'var(--rk-G)', sub:'Easy. Select 1 Advantage.',       adv:1, dis:0},
+  {label:'Average',col:'var(--rk-A)', sub:'Standard play. No adjustments.',  adv:0, dis:0},
+  {label:'Skilled',col:'var(--rk-S)', sub:'Hard. Select 1 Disadvantage.',    adv:0, dis:1},
+  {label:'Veteran',col:'var(--rk-V)', sub:'Very Hard. Select 2 Disadvantages.', adv:0, dis:2},
+  {label:'Ace',    col:'var(--rk-X)', sub:'Elite. Select 3 Disadvantages.',  adv:0, dis:3},
+];
+const ADVANTAGES=[
+  {id:'less-stress',   name:'Less Stress',            desc:'Pilots suffer 1 less Stress when flying a mission.'},
+  {id:'down-threats',  name:'Downgraded Sites/Bandits',desc:'Subtract 1 from all Site and Bandit attack rolls.'},
+  {id:'fewer-threats', name:'Fewer Sites/Bandits',     desc:'Place 1 fewer Site in Centre Area and draw 1 fewer Bandit.'},
+];
+const DISADVANTAGES=[
+  {id:'extra-stress',  name:'Extra Stress',            desc:'Pilots suffer 1 extra Stress when flying a mission.'},
+  {id:'imp-threats',   name:'Improved Sites/Bandits',  desc:'Add 1 to all Site and Bandit attack rolls.'},
+  {id:'extra-threats', name:'Extra Sites/Bandits',     desc:'Place 1 extra Site in Centre Area and draw 1 extra Bandit.'},
+  {id:'reduced-so',    name:'Reduced SOs',             desc:'Start with fewer SO Points. Short −6, Medium −15, Long −24.'},
+];
+const SQUAD_REQ={
+  short: [{r:'Newbie',n:1},{r:'Green',n:2},{r:'Average',n:4},{r:'Skilled',n:1}],
+  medium:[{r:'Newbie',n:1},{r:'Green',n:2},{r:'Average',n:5},{r:'Skilled',n:1},{r:'Veteran',n:1}],
+  long:  [{r:'Newbie',n:1},{r:'Green',n:2},{r:'Average',n:6},{r:'Skilled',n:2},{r:'Veteran',n:1}]
+};
+const CAMP_CFG={
+  short: {days:3,so:22,prom:6, rar:6},
+  medium:{days:6,so:44,prom:12,rar:9},
+  long:  {days:9,so:66,prom:18,rar:12}
+};
+const RECON_EFF=['2 cards/day','2 cards/day','2 cards/day','2 cards/day','2 cards/day','1 card/day','1 card/day','1 card/day','1 card/day'];
+const SD={
+  sa2: {name:'SA-2 Guideline',icon:'⬟',mod:2, lo:0,hi:1,stress:6,dam:8,dest:9, radar:1,soft:1},
+  sa14:{name:'SA-14 Gremlin', icon:'⬡',mod:-1,lo:1,hi:0,stress:6,dam:8,dest:10,radar:0,soft:1},
+  sa10:{name:'SA-10 Grumble', icon:'◈',mod:0, lo:1,hi:1,stress:3,dam:6,dest:8, radar:1,soft:1},
+  inf: {name:'Infantry AAA',  icon:'◆',mod:0, lo:1,hi:0,stress:6,dam:10,dest:11,radar:0,soft:1},
+};
+const BD={
+  mig23:{name:'MiG-23 Flogger',icon:'▲',mod:3,lo:1,hi:1,stress:3,dam:6,dest:9},
+  mig21:{name:'MiG-21 Fishbed',icon:'▲',mod:4,lo:1,hi:1,stress:4,dam:7,dest:9},
+  mig25:{name:'MiG-25 Foxbat', icon:'▲',mod:2,lo:1,hi:1,stress:2,dam:7,dest:9},
+  su27: {name:'Su-27 Flanker', icon:'▲',mod:1,lo:1,hi:1,stress:2,dam:5,dest:8},
+  su7:  {name:'Su-7 Fitter',   icon:'▲',mod:2,lo:1,hi:1,stress:4,dam:7,dest:10},
+  none: {name:'No Bandit',     icon:'○',mod:0,lo:0,hi:0,stress:0,dam:0,dest:0},
+};
+// Counter pool for Desert Storm
+const SITE_POOL  =['sa2','sa2','sa2','sa2','sa2','sa2','sa14','sa14','sa14','sa14','sa14','sa10','sa10','sa10','sa10','inf','inf','inf','inf','inf'];
+const BANDIT_POOL=['mig23','mig23','mig23','mig21','mig21','mig21','mig21','mig25','mig25','mig25','su27','su27','su7','su7','su7','none','none','none','none','none','none','none','none','none'];
+const WD={
+  AIM7:  {t:'ATA',lo:1,hi:1,w:1,d:[6,0,0,0],soft:0,veh:0},
+  AIM9:  {t:'ATA',lo:1,hi:1,w:1,d:[6,0,0,0],soft:0,veh:0},
+  AIM120:{t:'ATA',lo:1,hi:1,w:1,d:[6,0,0,0],soft:0,veh:0},
+  Shafrir:{t:'ATA',lo:1,hi:1,w:1,d:[6,0,0,0],soft:0,veh:0},
+  Python:{t:'ATA',lo:1,hi:1,w:1,d:[6,0,0,0],soft:0,veh:0},
+  CBU:   {t:'ATG',lo:1,hi:0,w:1,d:[8,0,0,0],soft:4,veh:0},
+  MK82:  {t:'ATG',lo:1,hi:0,w:1,d:[7,10,0,0],soft:0,veh:0},
+  MK83:  {t:'ATG',lo:1,hi:0,w:2,d:[5,7,10,0],soft:0,veh:0},
+  MK84:  {t:'ATG',lo:1,hi:0,w:3,d:[3,5,8,0],soft:0,veh:0},
+  M117R: {t:'ATG',lo:1,hi:0,w:2,d:[6,8,11,0],soft:3,veh:0},
+  M118:  {t:'ATG',lo:1,hi:0,w:4,d:[3,4,6,9],soft:0,veh:0},
+  AGM65: {t:'ATG',lo:1,hi:1,w:2,d:[7,10,0,0],soft:0,veh:3},
+  AGM78: {t:'ATG',lo:0,hi:1,w:2,d:[4,0,0,0],soft:0,veh:0},
+  AGM88: {t:'ATG',lo:0,hi:1,w:1,d:[4,0,0,0],soft:0,veh:0},
+  GBU10: {t:'ATG',lo:0,hi:1,w:3,d:[2,3,5,8],soft:0,veh:0},
+  GBU16: {t:'ATG',lo:0,hi:1,w:2,d:[3,5,7,9],soft:0,veh:0},
+  GBU12: {t:'ATG',lo:0,hi:1,w:1,d:[6,8,10,0],soft:0,veh:0},
+  Rocket:{t:'ATG',lo:1,hi:0,w:1,d:[7,0,0,0],soft:0,veh:0},
+  'ECM Pod':  {t:'Pod',lo:0,hi:0,w:1,d:[]},
+  'Fuel Tank':{t:'Pod',lo:0,hi:0,w:1,d:[]},
+};
+const ACD={
+  'A-4 Skyhawk':         {wp:5,w:['AIM9','CBU','MK82','MK83','MK84','M117R','AGM65','Rocket','Shafrir','Fuel Tank','ECM Pod']},
+  'C2 Kfir':             {wp:6,w:['AIM9','CBU','MK82','MK83','MK84','GBU10','GBU12','GBU16','Rocket','Python','Fuel Tank','ECM Pod']},
+  'F-4 Phantom':         {wp:6,w:['AIM7','AIM9','AIM120','CBU','MK82','MK83','MK84','M117R','M118','AGM65','AGM78','AGM88','GBU10','GBU12','Rocket','Shafrir','Fuel Tank','ECM Pod']},
+  'F-16 Fighting Falcon':{wp:6,w:['AIM9','AIM120','CBU','MK82','MK83','MK84','AGM65','AGM88','GBU10','GBU12','GBU16','Rocket','Python','Fuel Tank','ECM Pod']},
+  'F-15A Eagle':         {wp:8,w:['AIM7','AIM9','AIM120','Python','Fuel Tank','ECM Pod']},
+};
+const TGTS=[
+  {id:1, n:'Small Convoy',         ac:2,sA:1,sC:2,bA:0,bC:1,hits:6, vp:1,rc:0,ic:0,inf:1,st:1,inv:0,soft:1,veh:1,fixed:0,hard:0,esc:0},
+  {id:2, n:'Supply Convoy',        ac:4,sA:2,sC:0,bA:3,bC:0,hits:8, vp:1,rc:0,ic:1,inf:1,st:3,inv:1,soft:0,veh:1,fixed:0,hard:0,esc:0},
+  {id:6, n:'Mountain Stronghold',  ac:7,sA:2,sC:3,bA:1,bC:3,hits:11,vp:5,rc:1,ic:2,inf:2,st:3,inv:0,soft:0,veh:0,fixed:1,hard:1,esc:1},
+  {id:7, n:'Large Stronghold',     ac:5,sA:2,sC:2,bA:2,bC:1,hits:6, vp:2,rc:1,ic:1,inf:1,st:0,inv:0,soft:0,veh:0,fixed:1,hard:1,esc:0},
+  {id:8, n:'Stronghold',           ac:6,sA:4,sC:4,bA:1,bC:3,hits:5, vp:1,rc:2,ic:0,inf:1,st:2,inv:1,soft:0,veh:0,fixed:1,hard:0,esc:0},
+  {id:9, n:'Infantry',             ac:3,sA:1,sC:1,bA:1,bC:1,hits:8, vp:2,rc:0,ic:1,inf:0,st:1,inv:0,soft:1,veh:0,fixed:0,hard:0,esc:0},
+  {id:11,n:'Tank Spearhead',       ac:5,sA:1,sC:3,bA:1,bC:2,hits:9, vp:1,rc:1,ic:1,inf:0,st:2,inv:1,soft:0,veh:1,fixed:0,hard:0,esc:0},
+  {id:12,n:'Tank Formation',       ac:6,sA:2,sC:3,bA:1,bC:2,hits:14,vp:1,rc:0,ic:1,inf:1,st:3,inv:1,soft:0,veh:1,fixed:0,hard:0,esc:0},
+  {id:13,n:'Tanks',                ac:2,sA:1,sC:1,bA:1,bC:0,hits:4, vp:1,rc:1,ic:0,inf:0,st:2,inv:0,soft:0,veh:1,fixed:0,hard:0,esc:0},
+  {id:14,n:'Mixed Ground Troops',  ac:3,sA:1,sC:2,bA:1,bC:1,hits:7, vp:1,rc:0,ic:0,inf:0,st:2,inv:1,soft:0,veh:1,fixed:0,hard:0,esc:0},
+  {id:17,n:'SSM Launchers',        ac:4,sA:2,sC:4,bA:1,bC:1,hits:7, vp:2,rc:0,ic:0,inf:2,st:2,inv:1,soft:0,veh:1,fixed:0,hard:0,esc:1},
+  {id:18,n:'Surface-to-Surface Missiles',ac:7,sA:2,sC:5,bA:2,bC:3,hits:15,vp:2,rc:1,ic:1,inf:1,st:3,inv:1,soft:0,veh:1,fixed:0,hard:0,esc:0},
+  {id:19,n:'Convoy',               ac:2,sA:2,sC:0,bA:0,bC:2,hits:6, vp:1,rc:0,ic:0,inf:0,st:1,inv:0,soft:1,veh:1,fixed:0,hard:0,esc:0},
+  {id:21,n:'Supply Base',          ac:4,sA:2,sC:3,bA:1,bC:2,hits:7, vp:2,rc:0,ic:2,inf:0,st:2,inv:0,soft:0,veh:0,fixed:1,hard:0,esc:0},
+  {id:22,n:'Military Base',        ac:7,sA:2,sC:5,bA:2,bC:4,hits:13,vp:4,rc:0,ic:1,inf:2,st:3,inv:0,soft:0,veh:0,fixed:1,hard:0,esc:0},
+  {id:23,n:'Airfield',             ac:4,sA:1,sC:2,bA:1,bC:2,hits:7, vp:1,rc:1,ic:0,inf:0,st:0,inv:1,soft:0,veh:0,fixed:1,hard:0,esc:0},
+  {id:25,n:'Large Airbase',        ac:8,sA:2,sC:3,bA:2,bC:3,hits:15,vp:4,rc:0,ic:2,inf:2,st:3,inv:0,soft:0,veh:0,fixed:1,hard:0,esc:1},
+  {id:31,n:'Major City',           ac:5,sA:1,sC:2,bA:1,bC:3,hits:15,vp:2,rc:0,ic:0,inf:0,st:3,inv:0,soft:0,veh:0,fixed:1,hard:0,esc:1},
+  {id:32,n:'City',                 ac:3,sA:1,sC:1,bA:1,bC:1,hits:8, vp:1,rc:1,ic:1,inf:1,st:1,inv:0,soft:0,veh:0,fixed:1,hard:0,esc:0},
+  {id:33,n:'Nuclear Power Plant',  ac:6,sA:2,sC:3,bA:1,bC:2,hits:9, vp:7,rc:2,ic:2,inf:2,st:4,inv:0,soft:0,veh:0,fixed:1,hard:1,esc:1},
+  {id:36,n:'Central HQ',           ac:8,sA:3,sC:4,bA:2,bC:4,hits:19,vp:2,rc:1,ic:1,inf:0,st:3,inv:1,soft:0,veh:0,fixed:1,hard:0,esc:1},
+  {id:39,n:'Government Building',  ac:4,sA:1,sC:2,bA:1,bC:1,hits:13,vp:3,rc:0,ic:2,inf:1,st:2,inv:0,soft:0,veh:0,fixed:1,hard:0,esc:0},
+  {id:40,n:'Critical Buildings',   ac:6,sA:1,sC:2,bA:1,bC:4,hits:18,vp:3,rc:0,ic:2,inf:1,st:2,inv:0,soft:0,veh:0,fixed:1,hard:0,esc:0},
+  {id:42,n:'Close Air Support',    ac:4,sA:0,sC:3,bA:0,bC:2,hits:8, vp:3,rc:2,ic:1,inf:0,st:3,inv:0,soft:1,veh:0,fixed:0,hard:0,esc:0},
+];
+const ALL_PILOTS=[
+  {id:'max',name:'Max',ac:'C2 Kfir',ranks:[{r:'Newbie',exp:4,okHi:2,unfit:11,spd:'Slow',ata:-1,atg:-1,shAta:-3,shAtg:-3,cool:0,sa:0},{r:'Green',exp:5,okHi:4,unfit:11,spd:'Slow',ata:0,atg:0,shAta:-2,shAtg:-2,cool:0,sa:0},{r:'Average',exp:7,okHi:6,unfit:11,spd:'Slow',ata:1,atg:1,shAta:-1,shAtg:-1,cool:0,sa:0},{r:'Skilled',exp:11,okHi:4,unfit:11,spd:'Fast',ata:1,atg:0,shAta:0,shAtg:-1,cool:0,sa:0},{r:'Veteran',exp:9,okHi:5,unfit:11,spd:'Fast',ata:2,atg:1,shAta:0,shAtg:-1,cool:0,sa:0},{r:'Ace',exp:0,okHi:7,unfit:11,spd:'Fast',ata:3,atg:2,shAta:1,shAtg:0,cool:1,sa:0}]},
+  {id:'decoy',name:'Decoy',ac:'C2 Kfir',ranks:[{r:'Newbie',exp:5,okHi:2,unfit:11,spd:'Slow',ata:0,atg:0,shAta:-3,shAtg:-3,cool:0,sa:0},{r:'Green',exp:6,okHi:3,unfit:11,spd:'Slow',ata:1,atg:1,shAta:-2,shAtg:-2,cool:0,sa:0},{r:'Average',exp:8,okHi:3,unfit:11,spd:'Slow',ata:2,atg:1,shAta:0,shAtg:1,cool:1,sa:0},{r:'Skilled',exp:7,okHi:5,unfit:11,spd:'Slow',ata:2,atg:2,shAta:-1,shAtg:-1,cool:1,sa:0},{r:'Veteran',exp:12,okHi:5,unfit:11,spd:'Fast',ata:2,atg:2,shAta:0,shAtg:0,cool:0,sa:0},{r:'Ace',exp:0,okHi:7,unfit:11,spd:'Fast',ata:3,atg:2,shAta:1,shAtg:0,cool:1,sa:0}]},
+  {id:'ruby',name:'Ruby',ac:'C2 Kfir',ranks:[{r:'Newbie',exp:4,okHi:3,unfit:11,spd:'Slow',ata:-2,atg:-2,shAta:-3,shAtg:-3,cool:0,sa:0},{r:'Green',exp:7,okHi:5,unfit:11,spd:'Slow',ata:-1,atg:-1,shAta:-2,shAtg:-2,cool:1,sa:0},{r:'Average',exp:7,okHi:6,unfit:11,spd:'Slow',ata:0,atg:0,shAta:-1,shAtg:-1,cool:1,sa:0},{r:'Skilled',exp:8,okHi:5,unfit:11,spd:'Slow',ata:1,atg:0,shAta:0,shAtg:-1,cool:1,sa:1},{r:'Veteran',exp:12,okHi:5,unfit:11,spd:'Fast',ata:0,atg:0,shAta:-1,shAtg:-1,cool:1,sa:1},{r:'Ace',exp:0,okHi:6,unfit:11,spd:'Fast',ata:0,atg:0,shAta:-2,shAtg:-2,cool:2,sa:2}]},
+  {id:'demon',name:'Demon',ac:'C2 Kfir',ranks:[{r:'Newbie',exp:3,okHi:1,unfit:8,spd:'Slow',ata:-1,atg:-1,shAta:-4,shAtg:-4,cool:1,sa:0},{r:'Green',exp:3,okHi:2,unfit:8,spd:'Slow',ata:0,atg:0,shAta:-2,shAtg:-2,cool:1,sa:0},{r:'Average',exp:5,okHi:2,unfit:8,spd:'Slow',ata:1,atg:1,shAta:0,shAtg:0,cool:1,sa:0},{r:'Skilled',exp:6,okHi:3,unfit:9,spd:'Slow',ata:2,atg:2,shAta:1,shAtg:1,cool:1,sa:0},{r:'Veteran',exp:9,okHi:5,unfit:11,spd:'Slow',ata:3,atg:3,shAta:1,shAtg:1,cool:1,sa:0},{r:'Ace',exp:0,okHi:6,unfit:11,spd:'Fast',ata:3,atg:3,shAta:1,shAtg:1,cool:0,sa:0}]},
+  {id:'protector',name:'Protector',ac:'C2 Kfir',ranks:[{r:'Newbie',exp:3,okHi:2,unfit:11,spd:'Slow',ata:0,atg:-2,shAta:-2,shAtg:-4,cool:0,sa:0},{r:'Green',exp:5,okHi:4,unfit:11,spd:'Slow',ata:0,atg:-1,shAta:-2,shAtg:-3,cool:1,sa:0},{r:'Average',exp:6,okHi:6,unfit:11,spd:'Slow',ata:2,atg:-1,shAta:0,shAtg:-1,cool:0,sa:0},{r:'Skilled',exp:7,okHi:6,unfit:11,spd:'Slow',ata:1,atg:1,shAta:-1,shAtg:1,cool:1,sa:0},{r:'Veteran',exp:10,okHi:8,unfit:11,spd:'Slow',ata:2,atg:1,shAta:0,shAtg:-1,cool:1,sa:1},{r:'Ace',exp:0,okHi:8,unfit:11,spd:'Fast',ata:2,atg:1,shAta:0,shAtg:-1,cool:2,sa:0}]},
+  {id:'scratch',name:'Scratch',ac:'C2 Kfir',ranks:[{r:'Newbie',exp:4,okHi:3,unfit:11,spd:'Slow',ata:-1,atg:-2,shAta:-3,shAtg:-4,cool:0,sa:0},{r:'Green',exp:5,okHi:4,unfit:11,spd:'Slow',ata:-1,atg:1,shAta:-3,shAtg:-1,cool:0,sa:0},{r:'Average',exp:6,okHi:5,unfit:11,spd:'Slow',ata:1,atg:0,shAta:-1,shAtg:-2,cool:1,sa:0},{r:'Skilled',exp:7,okHi:6,unfit:11,spd:'Slow',ata:0,atg:2,shAta:-2,shAtg:0,cool:1,sa:0},{r:'Veteran',exp:14,okHi:8,unfit:11,spd:'Fast',ata:1,atg:1,shAta:-1,shAtg:-1,cool:1,sa:0},{r:'Ace',exp:0,okHi:8,unfit:11,spd:'Slow',ata:2,atg:3,shAta:0,shAtg:1,cool:2,sa:1}]},
+  {id:'storm',name:'Storm',ac:'F-4 Phantom',ranks:[{r:'Newbie',exp:2,okHi:2,unfit:11,spd:'Slow',ata:-2,atg:0,shAta:-5,shAtg:3,cool:0,sa:0},{r:'Green',exp:4,okHi:3,unfit:11,spd:'Slow',ata:-1,atg:1,shAta:-2,shAtg:0,cool:0,sa:0},{r:'Average',exp:5,okHi:6,unfit:11,spd:'Slow',ata:0,atg:1,shAta:-1,shAtg:0,cool:0,sa:0},{r:'Skilled',exp:6,okHi:5,unfit:11,spd:'Slow',ata:1,atg:1,shAta:-1,shAtg:-1,cool:0,sa:1},{r:'Veteran',exp:7,okHi:4,unfit:11,spd:'Slow',ata:0,atg:0,shAta:-2,shAtg:-2,cool:1,sa:3},{r:'Ace',exp:0,okHi:6,unfit:11,spd:'Slow',ata:1,atg:1,shAta:0,shAtg:0,cool:2,sa:3}]},
+  {id:'star',name:'Star',ac:'F-4 Phantom',ranks:[{r:'Newbie',exp:5,okHi:4,unfit:11,spd:'Slow',ata:-1,atg:-1,shAta:-4,shAtg:-4,cool:0,sa:0},{r:'Green',exp:8,okHi:5,unfit:11,spd:'Slow',ata:0,atg:0,shAta:-1,shAtg:-1,cool:0,sa:0},{r:'Average',exp:9,okHi:6,unfit:11,spd:'Slow',ata:1,atg:1,shAta:0,shAtg:0,cool:0,sa:0},{r:'Skilled',exp:9,okHi:4,unfit:11,spd:'Fast',ata:2,atg:0,shAta:-1,shAtg:-3,cool:0,sa:0},{r:'Veteran',exp:11,okHi:5,unfit:11,spd:'Fast',ata:1,atg:1,shAta:0,shAtg:0,cool:1,sa:0},{r:'Ace',exp:0,okHi:7,unfit:11,spd:'Fast',ata:1,atg:2,shAta:0,shAtg:1,cool:2,sa:0}]},
+  {id:'crusader',name:'Crusader',ac:'F-4 Phantom',ranks:[{r:'Newbie',exp:4,okHi:3,unfit:11,spd:'Slow',ata:-1,atg:-1,shAta:-4,shAtg:-4,cool:0,sa:1},{r:'Green',exp:7,okHi:5,unfit:11,spd:'Slow',ata:0,atg:0,shAta:-3,shAtg:-3,cool:1,sa:0},{r:'Average',exp:8,okHi:6,unfit:11,spd:'Slow',ata:1,atg:1,shAta:-2,shAtg:-2,cool:1,sa:0},{r:'Skilled',exp:9,okHi:6,unfit:11,spd:'Slow',ata:1,atg:1,shAta:-1,shAtg:-1,cool:2,sa:0},{r:'Veteran',exp:11,okHi:7,unfit:11,spd:'Slow',ata:2,atg:2,shAta:1,shAtg:1,cool:2,sa:0},{r:'Ace',exp:0,okHi:6,unfit:11,spd:'Slow',ata:3,atg:3,shAta:2,shAtg:2,cool:2,sa:1}]},
+  {id:'warrior',name:'Warrior',ac:'F-4 Phantom',ranks:[{r:'Newbie',exp:5,okHi:3,unfit:11,spd:'Slow',ata:-3,atg:-1,shAta:-5,shAtg:-3,cool:1,sa:0},{r:'Green',exp:6,okHi:4,unfit:11,spd:'Slow',ata:-2,atg:0,shAta:-3,shAtg:-1,cool:1,sa:0},{r:'Average',exp:9,okHi:5,unfit:11,spd:'Slow',ata:-1,atg:1,shAta:-3,shAtg:-1,cool:2,sa:0},{r:'Skilled',exp:10,okHi:7,unfit:11,spd:'Slow',ata:0,atg:2,shAta:-2,shAtg:0,cool:2,sa:0},{r:'Veteran',exp:11,okHi:7,unfit:11,spd:'Slow',ata:1,atg:3,shAta:-1,shAtg:1,cool:2,sa:0},{r:'Ace',exp:0,okHi:8,unfit:11,spd:'Fast',ata:0,atg:3,shAta:-3,shAtg:0,cool:2,sa:0}]},
+  {id:'rocket',name:'Rocket',ac:'F-16 Fighting Falcon',ranks:[{r:'Newbie',exp:8,okHi:3,unfit:11,spd:'Slow',ata:-1,atg:-1,shAta:-2,shAtg:-2,cool:0,sa:0},{r:'Green',exp:8,okHi:5,unfit:11,spd:'Slow',ata:0,atg:0,shAta:-1,shAtg:-1,cool:0,sa:0},{r:'Average',exp:10,okHi:6,unfit:11,spd:'Slow',ata:1,atg:1,shAta:-1,shAtg:-1,cool:1,sa:0},{r:'Skilled',exp:9,okHi:6,unfit:11,spd:'Slow',ata:1,atg:2,shAta:0,shAtg:1,cool:1,sa:0},{r:'Veteran',exp:12,okHi:7,unfit:11,spd:'Fast',ata:1,atg:1,shAta:0,shAtg:0,cool:0,sa:0},{r:'Ace',exp:0,okHi:8,unfit:11,spd:'Fast',ata:1,atg:1,shAta:1,shAtg:1,cool:1,sa:0}]},
+  {id:'blade',name:'Blade',ac:'F-16 Fighting Falcon',ranks:[{r:'Newbie',exp:6,okHi:3,unfit:11,spd:'Slow',ata:0,atg:-1,shAta:-3,shAtg:-4,cool:0,sa:0},{r:'Green',exp:8,okHi:4,unfit:11,spd:'Slow',ata:1,atg:0,shAta:-1,shAtg:-2,cool:0,sa:0},{r:'Average',exp:10,okHi:5,unfit:11,spd:'Slow',ata:1,atg:1,shAta:0,shAtg:0,cool:1,sa:0},{r:'Skilled',exp:10,okHi:5,unfit:11,spd:'Slow',ata:2,atg:2,shAta:-1,shAtg:-1,cool:0,sa:1},{r:'Veteran',exp:11,okHi:5,unfit:11,spd:'Slow',ata:2,atg:3,shAta:1,shAtg:2,cool:0,sa:1},{r:'Ace',exp:0,okHi:4,unfit:11,spd:'Fast',ata:3,atg:2,shAta:2,shAtg:1,cool:0,sa:1}]},
+  {id:'wild',name:'Wild',ac:'F-16 Fighting Falcon',ranks:[{r:'Newbie',exp:3,okHi:3,unfit:11,spd:'Slow',ata:-1,atg:-1,shAta:-4,shAtg:-4,cool:0,sa:0},{r:'Green',exp:5,okHi:4,unfit:11,spd:'Slow',ata:0,atg:0,shAta:-2,shAtg:-2,cool:0,sa:0},{r:'Average',exp:9,okHi:5,unfit:11,spd:'Slow',ata:1,atg:1,shAta:-1,shAtg:-1,cool:1,sa:0},{r:'Skilled',exp:10,okHi:6,unfit:11,spd:'Slow',ata:2,atg:0,shAta:1,shAtg:-1,cool:2,sa:0},{r:'Veteran',exp:11,okHi:6,unfit:11,spd:'Slow',ata:3,atg:1,shAta:2,shAtg:0,cool:2,sa:0},{r:'Ace',exp:0,okHi:8,unfit:11,spd:'Fast',ata:2,atg:2,shAta:-1,shAtg:-1,cool:2,sa:0}]},
+  {id:'zoom',name:'Zoom',ac:'F-16 Fighting Falcon',ranks:[{r:'Newbie',exp:2,okHi:2,unfit:11,spd:'Slow',ata:-2,atg:-2,shAta:-3,shAtg:-3,cool:0,sa:0},{r:'Green',exp:2,okHi:4,unfit:11,spd:'Slow',ata:-1,atg:-1,shAta:-2,shAtg:-2,cool:0,sa:0},{r:'Average',exp:6,okHi:6,unfit:11,spd:'Slow',ata:0,atg:0,shAta:-1,shAtg:-1,cool:1,sa:0},{r:'Skilled',exp:11,okHi:4,unfit:11,spd:'Fast',ata:0,atg:0,shAta:-3,shAtg:-3,cool:0,sa:1},{r:'Veteran',exp:12,okHi:5,unfit:11,spd:'Fast',ata:0,atg:1,shAta:-1,shAtg:0,cool:0,sa:1},{r:'Ace',exp:0,okHi:8,unfit:11,spd:'Fast',ata:1,atg:1,shAta:-2,shAtg:-2,cool:0,sa:2}]},
+  {id:'wing',name:'Wing',ac:'F-15A Eagle',ranks:[{r:'Newbie',exp:3,okHi:2,unfit:11,spd:'Slow',ata:1,atg:null,shAta:-1,shAtg:null,cool:0,sa:0},{r:'Green',exp:4,okHi:3,unfit:11,spd:'Slow',ata:2,atg:null,shAta:0,shAtg:null,cool:1,sa:0},{r:'Average',exp:5,okHi:5,unfit:11,spd:'Slow',ata:3,atg:null,shAta:1,shAtg:null,cool:1,sa:0},{r:'Skilled',exp:6,okHi:5,unfit:11,spd:'Slow',ata:3,atg:null,shAta:1,shAtg:null,cool:1,sa:1},{r:'Veteran',exp:10,okHi:5,unfit:11,spd:'Slow',ata:3,atg:null,shAta:1,shAtg:null,cool:2,sa:2},{r:'Ace',exp:0,okHi:4,unfit:11,spd:'Fast',ata:3,atg:null,shAta:1,shAtg:null,cool:2,sa:2}]},
+  {id:'scissors',name:'Scissors',ac:'F-15A Eagle',ranks:[{r:'Newbie',exp:2,okHi:2,unfit:11,spd:'Slow',ata:0,atg:null,shAta:-2,shAtg:null,cool:0,sa:0},{r:'Green',exp:2,okHi:5,unfit:11,spd:'Slow',ata:1,atg:null,shAta:-1,shAtg:null,cool:0,sa:0},{r:'Average',exp:3,okHi:6,unfit:11,spd:'Slow',ata:2,atg:null,shAta:0,shAtg:null,cool:1,sa:0},{r:'Skilled',exp:5,okHi:6,unfit:11,spd:'Slow',ata:3,atg:null,shAta:1,shAtg:null,cool:2,sa:0},{r:'Veteran',exp:6,okHi:7,unfit:11,spd:'Slow',ata:3,atg:null,shAta:1,shAtg:null,cool:2,sa:1},{r:'Ace',exp:0,okHi:8,unfit:11,spd:'Fast',ata:3,atg:null,shAta:1,shAtg:null,cool:2,sa:1}]},
+  {id:'wired',name:'Wired',ac:'F-15A Eagle',ranks:[{r:'Newbie',exp:3,okHi:2,unfit:11,spd:'Slow',ata:1,atg:null,shAta:-1,shAtg:null,cool:0,sa:0},{r:'Green',exp:4,okHi:4,unfit:11,spd:'Slow',ata:2,atg:null,shAta:0,shAtg:null,cool:0,sa:0},{r:'Average',exp:5,okHi:5,unfit:11,spd:'Slow',ata:2,atg:null,shAta:0,shAtg:null,cool:0,sa:1},{r:'Skilled',exp:6,okHi:5,unfit:11,spd:'Slow',ata:2,atg:null,shAta:0,shAtg:null,cool:0,sa:2},{r:'Veteran',exp:13,okHi:5,unfit:11,spd:'Fast',ata:2,atg:null,shAta:0,shAtg:null,cool:0,sa:2},{r:'Ace',exp:0,okHi:8,unfit:11,spd:'Fast',ata:3,atg:null,shAta:1,shAtg:null,cool:0,sa:2}]},
+  {id:'mouse',name:'Mouse',ac:'A-4 Skyhawk',ranks:[{r:'Newbie',exp:6,okHi:4,unfit:11,spd:'Slow',ata:-2,atg:-2,shAta:-3,shAtg:-3,cool:0,sa:0},{r:'Green',exp:8,okHi:5,unfit:11,spd:'Slow',ata:-1,atg:-1,shAta:-2,shAtg:-2,cool:1,sa:0},{r:'Average',exp:6,okHi:7,unfit:11,spd:'Slow',ata:0,atg:0,shAta:-2,shAtg:-2,cool:1,sa:0},{r:'Skilled',exp:10,okHi:7,unfit:11,spd:'Slow',ata:1,atg:0,shAta:-1,shAtg:-2,cool:1,sa:1},{r:'Veteran',exp:10,okHi:7,unfit:11,spd:'Slow',ata:1,atg:1,shAta:0,shAtg:0,cool:0,sa:2},{r:'Ace',exp:0,okHi:7,unfit:11,spd:'Slow',ata:2,atg:2,shAta:-1,shAtg:-1,cool:1,sa:3}]},
+  {id:'little',name:'Little',ac:'A-4 Skyhawk',ranks:[{r:'Newbie',exp:3,okHi:2,unfit:11,spd:'Slow',ata:-2,atg:0,shAta:-4,shAtg:-2,cool:0,sa:0},{r:'Green',exp:5,okHi:4,unfit:11,spd:'Slow',ata:-1,atg:1,shAta:-3,shAtg:-1,cool:0,sa:0},{r:'Average',exp:8,okHi:5,unfit:11,spd:'Slow',ata:0,atg:1,shAta:-1,shAtg:0,cool:1,sa:0},{r:'Skilled',exp:10,okHi:7,unfit:11,spd:'Slow',ata:-1,atg:2,shAta:-2,shAtg:1,cool:2,sa:0},{r:'Veteran',exp:12,okHi:8,unfit:11,spd:'Slow',ata:0,atg:3,shAta:-1,shAtg:2,cool:2,sa:0},{r:'Ace',exp:0,okHi:8,unfit:11,spd:'Fast',ata:1,atg:2,shAta:-1,shAtg:0,cool:2,sa:0}]},
+];
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let S={
+  step:1,
+  camp:'ds', len:'short', diff:2,
+  adjActive:[],
+  squad:[],        // {srcId,name,ac,rank,exp,stress,status,missions,kills,promoHistory:[]}
+  so:22, recon:0,
+  expandedId:null, sort:'name',
+  promoIdx:-1,
+  // Mission state
+  G:null,          // full game state once campaign begins
+  M:{              // current mission
+    tgt:null, drawnTgts:[], selectedPilots:[], alt:'low',
+    wLoads:{},     // pilotIdx -> [weaponName,...]
+    appSites:[], appBandits:[], ctrSites:[], ctrBandits:[],
+    activePilot:null, targetsDrawnToday:false,
+  }
+};
+
+// ═══════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════
+const fm=n=>n===null?'—':n>=0?'+'+n:''+n;
+const vc=n=>n===null?'dim':n>0?'p':n<0?'n':'z';
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const rnd=n=>Math.floor(Math.random()*n);
+const d10=()=>rnd(10)+1;
+const shuffle=a=>{const b=[...a];for(let i=b.length-1;i>0;i--){const j=rnd(i+1);[b[i],b[j]]=[b[j],b[i]];}return b;};
+const getSrc=id=>ALL_PILOTS.find(p=>p.id===id);
+const getRd=p=>{const s=getSrc(p.srcId);return s?s.ranks.find(r=>r.r===p.rank):null;};
+const isShk=p=>{const r=getRd(p);return r?p.stress>r.okHi:false;};
+const pATA=p=>{const r=getRd(p);return r?(isShk(p)?r.shAta:r.ata):0;};
+const pATG=p=>{const r=getRd(p);return r&&r.atg!==null?(isShk(p)?r.shAtg:r.atg):null;};
+
+function rkBdg(r){return`<span class="bdg ${RK_CLS[r]||'bX'}">${r}</span>`;}
+function toast(msg,ms=2200){const e=document.getElementById('toast');e.textContent=msg;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),ms);}
+function closeM(id){document.getElementById(id).classList.remove('open');}
+function openM(id){document.getElementById(id).classList.add('open');}
+function pop(el,gid){document.getElementById(gid).querySelectorAll('.op').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');}
+function gop(gid){const s=document.querySelector('#'+gid+' .op.sel');return s?s.dataset.val:null;}
+function stab(el,...ids){el.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');ids.forEach((id,i)=>{const e=document.getElementById(id);if(e)e.style.display=i===0?'block':'none';});}
+
+// ═══════════════════════════════════════
+// STEP NAV — SETUP (steps 1-3)
+// ═══════════════════════════════════════
+const STEP_PANELS={1:['p1L','p1R'],2:['p2L','p2R'],3:['p3L','p3R']};
+function gotoStep(n){
+  if(n>S.step){
+    if(n===2&&!validateStep1())return;
+    if(n===3&&!validateStep2())return;
+  }
+  S.step=n; renderStep();
+}
+function nextStep(){
+  if(S.step===1){if(!validateStep1())return;S.step=2;renderStep();renderBrowser();renderMySquad();}
+  else if(S.step===2){if(!validateStep2())return;S.step=3;renderStep();renderPreCamp();}
+  else if(S.step===3){const tabs=document.querySelectorAll('#p3R .tab');if(tabs[1])tabs[1].click();}
+}
+function prevStep(){if(S.step>1&&S.step<=3){S.step--;renderStep();}}
+function validateStep1(){S.len=gop('len-g')||'short';return true;}
+function validateStep2(){
+  const req=SQUAD_REQ[S.len];
+  for(const {r,n} of req){if(S.squad.filter(p=>p.rank===r).length<n){toast('Fill all required rank slots — check My Squadron');return false;}}
+  return true;
+}
+function renderStep(){
+  Object.entries(STEP_PANELS).forEach(([step,ids])=>{
+    const show=parseInt(step)===S.step;
+    ids.forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=show?'flex':'none';});
+  });
+  for(let i=1;i<=3;i++){
+    const el=document.getElementById('stp'+i);if(!el)continue;
+    el.className='step'+(i===S.step?' on':i<S.step?' done':'');
+  }
+  document.getElementById('ab-back').style.display=(S.step>1&&S.step<=3)?'inline-flex':'none';
+  const nb=document.getElementById('ab-next');
+  const nextLabels={1:'Build Squadron →',2:'Pre-Campaign →',3:'Summary →'};
+  nb.textContent=nextLabels[S.step]||'Next →';
+  const info={1:'Select campaign, length, and difficulty',2:'Add pilots to fill all required rank slots',3:'Spend SO on promotions before the campaign begins'};
+  document.getElementById('abar-info').textContent=info[S.step]||'';
+}
+
+// ═══════════════════════════════════════
+// STEP 1 — CAMPAIGN CONFIG
+// ═══════════════════════════════════════
+function selCamp(id){
+  S.camp=id;
+  document.querySelectorAll('.cc:not(.locked)').forEach(c=>c.classList.remove('sel'));
+  document.querySelectorAll('[id^=cc-][id$=-mk]').forEach(m=>m.style.display='none');
+  const c=document.getElementById('cc-'+id),m=document.getElementById('cc-'+id+'-mk');
+  if(c)c.classList.add('sel');if(m)m.style.display='block';
+}
+function upLen(){
+  S.len=gop('len-g')||'short';
+  const cfg=CAMP_CFG[S.len];const req=SQUAD_REQ[S.len];
+  document.getElementById('l-so').textContent=cfg.so;
+  document.getElementById('l-pil').textContent=req.reduce((a,r)=>a+r.n,0);
+  document.getElementById('l-prom').textContent=cfg.prom+' SO/rank';
+}
+function upDiff(){
+  const v=parseInt(document.getElementById('diff-sl').value);
+  S.diff=v;const di=DIFF_INFO[v];
+  document.getElementById('diff-val').textContent=di.label;
+  document.getElementById('diff-val').style.color=di.col;
+  document.getElementById('diff-sub').textContent=di.sub;
+  // Show/hide adjustment section
+  const wrap=document.getElementById('adj-wrap');
+  if(di.adv===0&&di.dis===0){wrap.style.display='none';S.adjActive=[];return;}
+  wrap.style.display='block';
+  const needed=di.adv>0?di.adv:di.dis;
+  const type=di.adv>0?'Advantage':'Disadvantage';
+  document.getElementById('adj-title').textContent=`Select ${needed} ${type}${needed>1?'s':''}`;
+  renderAdjList(di);
+  // Reset selections that no longer apply
+  if(di.adv>0) S.adjActive=S.adjActive.filter(id=>ADVANTAGES.some(a=>a.id===id));
+  else S.adjActive=S.adjActive.filter(id=>DISADVANTAGES.some(d=>d.id===id));
+  renderAdjList(di);
+}
+function renderAdjList(di){
+  const items=di.adv>0?ADVANTAGES:DISADVANTAGES;
+  const type=di.adv>0?'adv':'dis';
+  document.getElementById('adj-list').innerHTML=items.map(item=>`
+    <div class="adj ${type} ${S.adjActive.includes(item.id)?'on':''}" onclick="togAdj('${item.id}','${type}')">
+      <div class="adj-chk">${S.adjActive.includes(item.id)?'✓':''}</div>
+      <div><div class="adj-n">${item.name}</div><div class="adj-d">${item.desc}</div></div>
+    </div>`).join('');
+}
+function togAdj(id,type){
+  const di=DIFF_INFO[S.diff];
+  const max=di.adv>0?di.adv:di.dis;
+  const items=type==='adv'?ADVANTAGES:DISADVANTAGES;
+  const pos=S.adjActive.indexOf(id);
+  if(pos!==-1){S.adjActive.splice(pos,1);}
+  else{
+    if(S.adjActive.length>=max){toast('Already selected '+max+(max===1?' adjustment':' adjustments'));return;}
+    S.adjActive.push(id);
+  }
+  renderAdjList(di);
+}
+function randAdj(){
+  const di=DIFF_INFO[S.diff];
+  const items=di.adv>0?ADVANTAGES:DISADVANTAGES;
+  const max=di.adv>0?di.adv:di.dis;
+  S.adjActive=shuffle(items.map(i=>i.id)).slice(0,max);
+  renderAdjList(di);toast('Randomised!');
+}
+
+// ═══════════════════════════════════════
+// STEP 2 — SQUADRON BUILDER
+// ═══════════════════════════════════════
+function setSort(s){
+  S.sort=s;
+  document.querySelectorAll('.srt').forEach(b=>b.classList.remove('on'));
+  const el=document.getElementById('sb-'+s);if(el)el.classList.add('on');
+  renderBrowser();
+}
+function renderBrowser(){
+  const ac=document.getElementById('f-ac')?.value||'';
+  const rank=document.getElementById('f-rank')?.value||'';
+  const mAta=document.getElementById('f-ata')?.value||'';
+  const mAtg=document.getElementById('f-atg')?.value||'';
+  const mCool=document.getElementById('f-cool')?.value||'';
+  const mSa=document.getElementById('f-sa')?.value||'';
+  let pilots=[...ALL_PILOTS];
+  if(ac) pilots=pilots.filter(p=>p.ac===ac);
+  pilots=pilots.filter(p=>p.ranks.some(rd=>{
+    if(rank&&rd.r!==rank)return false;
+    if(mAta!==''&&rd.ata<parseInt(mAta))return false;
+    if(mAtg!==''&&(rd.atg===null||rd.atg<parseInt(mAtg)))return false;
+    if(mCool!==''&&rd.cool<parseInt(mCool))return false;
+    if(mSa!==''&&rd.sa<parseInt(mSa))return false;
+    return true;
+  }));
+  pilots.sort((a,b)=>{
+    if(S.sort==='name')return a.name.localeCompare(b.name);
+    const gv=(p)=>{
+      const rs=p.ranks.filter(rd=>{if(rank&&rd.r!==rank)return false;if(mAta!==''&&rd.ata<parseInt(mAta))return false;return true;});
+      if(!rs.length)return -99;
+      return Math.max(...rs.map(rd=>S.sort==='ata'?rd.ata:S.sort==='atg'?(rd.atg??-99):S.sort==='cool'?rd.cool:rd.sa));
+    };
+    return gv(b)-gv(a);
+  });
+  const cnt=document.getElementById('br-cnt');
+  if(cnt)cnt.textContent=pilots.length+' pilot'+(pilots.length!==1?'s':'')+' shown';
+  const el=document.getElementById('browser-list');if(!el)return;
+  el.innerHTML=pilots.map(p=>{
+    const inQ=S.squad.some(s=>s.srcId===p.id);
+    const isExp=S.expandedId===p.id;
+    const visRanks=p.ranks.filter(rd=>{
+      if(rank&&rd.r!==rank)return false;
+      if(mAta!==''&&rd.ata<parseInt(mAta))return false;
+      if(mAtg!==''&&(rd.atg===null||rd.atg<parseInt(mAtg)))return false;
+      if(mCool!==''&&rd.cool<parseInt(mCool))return false;
+      if(mSa!==''&&rd.sa<parseInt(mSa))return false;
+      return true;
+    });
+    return`<div class="pc ${inQ?'inq':''} ${isExp?'exp':''}" id="bpc-${p.id}">
+      <div class="pc-h" onclick="togExp('${p.id}')">
+        <div style="flex:1;min-width:0">
+          <div class="pc-n">${p.name} ${inQ?'<span class="bdg bGr">✓</span>':''}</div>
+          <div class="pc-sub">${rkBdg(p.ac==='F-15A Eagle'?p.ac:p.ac)}<span class="bdg bX" style="font-size:7px">${p.ac}</span> ${visRanks.map(r=>rkBdg(r.r)).join('')}</div>
+        </div>
+        <button class="pc-btn ${inQ?'rem':'add'}" onclick="event.stopPropagation();togSquad('${p.id}')">${inQ?'− Remove':'+ Add'}</button>
+        <span style="font-size:8px;color:var(--ink3);margin-left:4px">${isExp?'▲':'▼'}</span>
+      </div>
+      ${isExp?rankGrid(p,visRanks):''}
+    </div>`;
+  }).join('')||'<div class="sm dim ctr" style="padding:16px">No pilots match filters</div>';
+}
+function rankGrid(pilot,ranks){
+  const hdrs=['OK Str','Unfit','Speed','ATA','ShkATA','ATG','ShkATG','Cool','SA'];
+  const rkColorClass={Newbie:'cN',Green:'cG',Average:'cA',Skilled:'cS',Veteran:'cV',Ace:'cX'};
+  return`<div class="rg">
+    <div class="rgh ln">Rank / XP</div>${hdrs.map(h=>`<div class="rgh">${h}</div>`).join('')}
+    ${ranks.map(rd=>`
+      <div class="rgc ln ${rkColorClass[rd.r]||''}">${rd.r}<br><span style="font-size:6px;opacity:.6">${rd.exp?rd.exp+' XP':'Max'}</span></div>
+      <div class="rgc go">0–${rd.okHi}</div>
+      <div class="rgc n">${rd.unfit}+</div>
+      <div class="rgc ${rd.spd==='Fast'?'go':'z'}">${rd.spd}</div>
+      <div class="rgc ${vc(rd.ata)}">${fm(rd.ata)}</div>
+      <div class="rgc ${vc(rd.shAta)}">${fm(rd.shAta)}</div>
+      ${rd.atg!==null?`<div class="rgc ${vc(rd.atg)}">${fm(rd.atg)}</div><div class="rgc ${vc(rd.shAtg)}">${fm(rd.shAtg)}</div>`:`<div class="rgc z">—</div><div class="rgc z">—</div>`}
+      <div class="rgc ${rd.cool>0?'bl':'z'}">${rd.cool}</div>
+      <div class="rgc ${rd.sa>0?'go':'z'}">${rd.sa}</div>
+    `).join('')}
+  </div>`;
+}
+function togExp(id){
+  S.expandedId=S.expandedId===id?null:id;renderBrowser();
+  if(S.expandedId){setTimeout(()=>{document.getElementById('bpc-'+id)?.scrollIntoView({behavior:'smooth',block:'nearest'});},60);}
+}
+function togSquad(pid){
+  const i=S.squad.findIndex(p=>p.srcId===pid);
+  if(i!==-1){S.squad.splice(i,1);toast('Removed');}
+  else{
+    const src=getSrc(pid);
+    const req=SQUAD_REQ[S.len];
+    let assignRank='Average';
+    for(const {r,n} of req){if(S.squad.filter(p=>p.rank===r).length<n&&src.ranks.some(rd=>rd.r===r)){assignRank=r;break;}}
+    S.squad.push({srcId:pid,name:src.name,ac:src.ac,rank:assignRank,exp:0,stress:0,status:'OK',missions:0,kills:0,promoHistory:[]});
+    toast(src.name+' added as '+assignRank);
+  }
+  renderBrowser();renderMySquad();upChips();
+}
+function renderMySquad(){
+  const req=SQUAD_REQ[S.len];
+  const tot=req.reduce((a,r)=>a+r.n,0);
+  const sub=document.getElementById('s2-sub');if(sub)sub.textContent=S.squad.length+' / '+tot+' pilots';
+  const sv=document.getElementById('slot-view');
+  if(sv)sv.innerHTML=req.map(({r,n})=>{
+    const have=S.squad.filter(p=>p.rank===r).length;
+    const ok=have>=n;
+    return`<div class="sq ${ok?'ok':'sh'}">
+      <div class="sq-r" style="color:${RK_COL[r]||'var(--ink3)'}">${r}</div>
+      <div class="sq-info">
+        <div class="sq-n" style="color:${ok?'var(--green2)':'var(--red2)'}">${have}/${n} ${ok?'✓':'needed'}</div>
+        <div class="sq-d">${S.squad.filter(p=>p.rank===r).map(p=>p.name).join(', ')||'—'}</div>
+      </div>
+    </div>`;
+  }).join('');
+  const sl=document.getElementById('squad-list');const se=document.getElementById('squad-empty');
+  if(!S.squad.length){if(sl)sl.innerHTML='';if(se)se.style.display='block';return;}
+  if(se)se.style.display='none';
+  if(sl)sl.innerHTML=S.squad.map((p,i)=>{
+    const src=getSrc(p.srcId);
+    return`<div class="pc inq">
+      <div class="pc-h" style="cursor:default;flex-direction:column;align-items:stretch">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+          <div><div class="pc-n">${p.name}</div><div class="pc-sub mt4"><span class="bdg bX" style="font-size:7px">${p.ac}</span>${rkBdg(p.rank)}</div></div>
+          <button class="pc-btn rem" onclick="togSquad('${p.srcId}')">− Remove</button>
+        </div>
+        <div style="font-size:7px;color:var(--ink3);margin-bottom:3px">Rank assignment:</div>
+        <div style="display:flex;gap:2px;flex-wrap:wrap">
+          ${src.ranks.map(rd=>`<div class="op ${p.rank===rd.r?'sel':''}" style="padding:3px 7px;font-size:7px;color:${p.rank===rd.r?'var(--gold2)':RK_COL[rd.r]||'var(--ink3)'};border-color:${p.rank===rd.r?'var(--gold)':RK_COL[rd.r]||'var(--line2)'}" onclick="changeRank(${i},'${rd.r}')">${rd.r}</div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function changeRank(i,r){S.squad[i].rank=r;S.squad[i].exp=0;renderMySquad();renderBrowser();}
+function upChips(){
+  document.getElementById('ch-so').textContent=S.so;
+}
+
+// ═══════════════════════════════════════
+// STEP 3 — PRE-CAMPAIGN
+// ═══════════════════════════════════════
+function renderPreCamp(){
+  S.so=CAMP_CFG[S.len].so;
+  // Apply reduced SO disadvantage
+  if(S.adjActive.includes('reduced-so')){
+    const red={short:6,medium:15,long:24}[S.len]||6;
+    S.so-=red;toast('Reduced SOs disadvantage: −'+red+' SO');
+  }
+  upSODisplay();renderPCPilots();renderPromoList();
+}
+function upSODisplay(){
+  const cfg=CAMP_CFG[S.len];
+  ['so-n'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=S.so;});
+  const pc=document.getElementById('pc-lbl');if(pc)pc.textContent=cfg.prom;
+  upChips();
+}
+function renderPCPilots(){
+  const cfg=CAMP_CFG[S.len];
+  document.getElementById('precamp-pilots').innerHTML=S.squad.map((p,i)=>{
+    const rd=getRd(p);const next=RANKS[RANKS.indexOf(p.rank)+1];
+    return`<div class="pm">
+      <div class="pm-top">
+        <div><div class="pm-n">${p.name}</div>
+          <div class="pc-sub mt4">${rkBdg(p.rank)}<span class="bdg bX" style="font-size:7px">${p.ac}</span></div>
+        </div>
+        <div style="display:flex;gap:4px;align-items:center">
+          ${p.promoHistory&&p.promoHistory.length?`<button class="btn btn-r sm" onclick="undoPromo(${i})" title="Undo last promotion">↩ Undo</button>`:''}
+          ${next?`<button class="btn btn-p sm" onclick="openPromo(${i})" ${S.so>=cfg.prom?'':'style="opacity:.4;cursor:not-allowed"'}>↑ ${next}</button>`:`<span class="bdg bX" style="font-size:7px">Max Rank</span>`}
+        </div>
+      </div>
+      ${rd?`<div class="pm-stats">
+        <div class="pst">ATA <b>${fm(rd.ata)}</b></div>
+        ${rd.atg!==null?`<div class="pst">ATG <b>${fm(rd.atg)}</b></div>`:''}
+        <div class="pst">Cool <b>${rd.cool}</b></div>
+        <div class="pst">SA <b>${rd.sa}</b></div>
+        <div class="pst">OK <b>0–${rd.okHi}</b></div>
+        <div class="pst">Unfit <b>${rd.unfit}+</b></div>
+        <div class="pst">Spd <b>${rd.spd}</b></div>
+      </div>
+      ${rd.exp>0?`<div class="xpr">XP ${p.exp}/${rd.exp}<div class="xpb"><div class="xpf" style="width:${Math.round(p.exp/rd.exp*100)}%"></div></div></div>`:''}`:''}
+      ${p.promoHistory&&p.promoHistory.length?`<div class="prom-hist">Promoted: ${p.promoHistory.join(' → ')}</div>`:''}
+    </div>`;
+  }).join('');
+}
+function renderPromoList(){
+  const cfg=CAMP_CFG[S.len];
+  document.getElementById('promo-list').innerHTML=S.squad.map((p,i)=>{
+    const next=RANKS[RANKS.indexOf(p.rank)+1];
+    if(!next)return`<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--line);font-size:10px"><span class="dim">${p.name}</span><span class="bdg rX">Ace — Max</span></div>`;
+    return`<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--line);font-size:10px">
+      <span class="dim">${p.name} <span style="color:${RK_COL[p.rank]}">${p.rank}</span> → <span style="color:${RK_COL[next]}">${next}</span></span>
+      <button class="btn btn-p sm" onclick="openPromo(${i})" ${S.so>=cfg.prom?'':'style="opacity:.4;cursor:not-allowed"'}>${cfg.prom} SO</button>
+    </div>`;
+  }).join('');
+}
+function openPromo(i){
+  S.promoIdx=i;const p=S.squad[i];const cfg=CAMP_CFG[S.len];
+  const next=RANKS[RANKS.indexOf(p.rank)+1];if(!next){toast('Max rank');return;}
+  const nextRd=getSrc(p.srcId)?.ranks.find(r=>r.r===next);
+  document.getElementById('pm-ttl').textContent='Promote '+p.name;
+  document.getElementById('pm-body').innerHTML=`
+    <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
+      ${rkBdg(p.rank)}<span style="color:var(--ink3)">→</span>${rkBdg(next)}
+      <span style="margin-left:auto;font-size:11px;color:var(--gold2);font-weight:700">Cost: ${cfg.prom} SO</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--ink3);margin-bottom:10px">
+      <span>Available SO: <b style="color:var(--gold2)">${S.so}</b></span>
+      <span>After: <b style="color:${S.so>=cfg.prom?'var(--green2)':'var(--red2)'}">${S.so-cfg.prom} SO</b></span>
+    </div>
+    ${nextRd?rankGrid(getSrc(p.srcId),[nextRd]):''}
+    <div style="display:flex;gap:6px;margin-top:10px">
+      <button class="btn btn-x sm" style="flex:1" onclick="closeM('mod-promo')">Cancel</button>
+      <button class="btn btn-p sm" style="flex:1" onclick="confirmPromo()" ${S.so>=cfg.prom?'':'disabled style="opacity:.4"'}>Promote — ${cfg.prom} SO</button>
+    </div>`;
+  openM('mod-promo');
+}
+function confirmPromo(){
+  const p=S.squad[S.promoIdx];const cfg=CAMP_CFG[S.len];
+  if(S.so<cfg.prom){toast('Not enough SO');return;}
+  const next=RANKS[RANKS.indexOf(p.rank)+1];if(!next)return;
+  if(!p.promoHistory)p.promoHistory=[];
+  p.promoHistory.push(p.rank+' → '+next);
+  S.so-=cfg.prom;p.rank=next;p.exp=0;
+  closeM('mod-promo');upSODisplay();renderPCPilots();renderPromoList();
+  toast(p.name+' promoted to '+next+' (−'+cfg.prom+' SO)');
+}
+function undoPromo(i){
+  const p=S.squad[i];const cfg=CAMP_CFG[S.len];
+  if(!p.promoHistory||!p.promoHistory.length){toast('Nothing to undo');return;}
+  const last=p.promoHistory.pop();
+  const prevRank=last.split(' → ')[0];
+  p.rank=prevRank;p.exp=0;S.so+=cfg.prom;
+  upSODisplay();renderPCPilots();renderPromoList();
+  toast('↩ Promotion reversed — +'+cfg.prom+' SO returned');
+}
+function renderSum(){
+  const cfg=CAMP_CFG[S.len];const di=DIFF_INFO[S.diff];
+  document.getElementById('sm-len').textContent=S.len.charAt(0).toUpperCase()+S.len.slice(1)+' ('+cfg.days+' days)';
+  document.getElementById('sm-diff').textContent=di.label;
+  document.getElementById('sm-so').textContent=S.so;
+  const adjNames=S.adjActive.map(id=>{
+    const a=ADVANTAGES.find(x=>x.id===id)||DISADVANTAGES.find(x=>x.id===id);
+    return a?a.name:id;
+  });
+  document.getElementById('sm-adj').textContent=adjNames.length?adjNames.join(', '):'None';
+  document.getElementById('sm-squad').innerHTML=S.squad.map(p=>{
+    const rd=getRd(p);
+    return`<div class="sq ok" style="margin-bottom:3px">
+      <div class="sq-r" style="color:${RK_COL[p.rank]}">${p.rank}</div>
+      <div class="sq-info">
+        <div class="sq-n">${p.name}</div>
+        <div class="sq-d">${p.ac}${rd?' · ATA '+fm(rd.ata)+(rd.atg!==null?' · ATG '+fm(rd.atg):'')+'  · Cool '+rd.cool+' · SA '+rd.sa:''}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function beginCampaign(){
+  const cfg=CAMP_CFG[S.len];
+  S.G={
+    started:true,camp:S.camp,len:S.len,diff:S.diff,adj:[...S.adjActive],
+    day:1,totalDays:cfg.days,vp:0,so:S.so,recon:S.recon,intel:0,infra:0,invasion:0,
+    missions:0,kia:0,activeEsc:[],usSupport:true,
+    pilots:S.squad.map(p=>({...p,promoHistory:[...p.promoHistory]}))
+  };
+  localStorage.setItem('iaf_save',JSON.stringify(S.G));
+  // Switch to campaign mode
+  document.getElementById('topbar-setup').style.display='none';
+  document.getElementById('topbar-camp').style.display='flex';
+  document.getElementById('shell').classList.add('in-campaign');
+  renderMapScreen();
+  gotoMissionScreen('map');
+}
+
+// ═══════════════════════════════════════
+// CAMPAIGN MODE — SCREEN SWITCHING
+// ═══════════════════════════════════════
+const MISSION_SCREENS={map:'scr-map',target:'scr-target',seed:'scr-seed',arm:'scr-arm'};
+function gotoMissionScreen(name){
+  Object.values(MISSION_SCREENS).forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none';});
+  const el=document.getElementById(MISSION_SCREENS[name]);if(el)el.style.display='flex';
+  document.querySelectorAll('#camp-nav .step').forEach(s=>s.classList.remove('on'));
+  const navId={map:'cn-map',target:'cn-tgt',seed:'cn-seed',arm:'cn-arm'}[name];
+  const navEl=document.getElementById(navId);if(navEl)navEl.classList.add('on');
+  upCampChips();
+}
+function upCampChips(){
+  if(!S.G)return;
+  document.getElementById('ch-day').textContent=S.G.day;
+  document.getElementById('ch-totaldays').textContent=S.G.totalDays;
+  document.getElementById('ch-vp').textContent=S.G.vp;
+  document.getElementById('ch-so').textContent=S.G.so;
+}
+
+// ═══════════════════════════════════════
+// CAMPAIGN MAP SCREEN
+// ═══════════════════════════════════════
+// Approximate map coordinates for each target ID (based on reference image layout)
+const TARGET_COORDS={
+  1:[295,395],2:[380,255],6:[420,190],7:[420,175],8:[555,455],9:[380,290],
+  11:[335,405],12:[625,510],13:[420,570],14:[440,270],17:[550,425],18:[500,300],
+  19:[400,340],21:[NaN,NaN],22:[655,520],23:[NaN,NaN],25:[590,455],27:[350,455],
+  28:[470,195],29:[440,600],30:[520,340],31:[600,510],32:[315,395],33:[420,340],
+  36:[540,375],39:[NaN,NaN],40:[400,485],42:[365,485]
+};
+// Effect-text tables — human readable, code stays numeric underneath
+const RECON_TEXT=['2 cards/day','2 cards/day','2 cards/day','2 cards/day','2 cards/day','1 card/day','1 card/day','1 card/day','1 card/day'];
+const INTEL_TEXT=['No Change','−1 Centre Site','−1 Centre Site','−1 Site','−1 Site','−1 Bandit or Site','−1 Bandit or Site','−1 Bandit and Site','−2 Bandits and Sites'];
+const INFRA_TEXT=n=>n>0?`+${n} Hits`:n===0?'No Change':`${n} Hits`;
+const INVASION_TEXT=['No Penalty','No Penalty','+1 Stress each Mission'];
+
+function renderMapScreen(){
+  document.getElementById('map-camp-title').textContent='1991: DESERT STORM';
+  document.getElementById('map-diff-label').textContent=DIFF_INFO[S.diff].label.toUpperCase();
+  document.getElementById('map-us-status').textContent=S.G.usSupport?'AVAILABLE':'USED';
+  document.getElementById('map-us-status').className=S.G.usSupport?'us-avail':'us-used';
+  // Day track
+  const dt=document.getElementById('map-day-track');dt.innerHTML='';
+  for(let i=1;i<=S.G.totalDays;i++){
+    const p=document.createElement('div');
+    p.className='map-day-pip'+(i<S.G.day?' past':i===S.G.day?' cur':'');
+    p.textContent=i;dt.appendChild(p);
+  }
+  document.getElementById('map-day-detail').textContent=`Day ${S.G.day} of ${S.G.totalDays}`;
+  document.getElementById('map-vp').textContent=S.G.vp;
+  document.getElementById('map-so').textContent=S.G.so;
+  // Tracks strip — effect text, not raw numbers
+  document.getElementById('track-strip').innerHTML=`
+    <div class="track-mini"><div class="track-mini-t" style="color:var(--gold2)">RECON</div><div class="track-mini-v" style="font-size:9px">${RECON_TEXT[S.G.recon]||'—'}</div></div>
+    <div class="track-mini"><div class="track-mini-t" style="color:var(--blue2)">INTEL</div><div class="track-mini-v" style="color:var(--blue2);font-size:9px">${INTEL_TEXT[S.G.intel]||'—'}</div></div>
+    <div class="track-mini"><div class="track-mini-t" style="color:var(--amber2)">INFRA</div><div class="track-mini-v" style="color:var(--amber2);font-size:9px">${INFRA_TEXT(S.G.infra)}</div></div>
+    <div class="track-mini"><div class="track-mini-t" style="color:var(--red2)">INVASION</div><div class="track-mini-v" style="color:var(--red2);font-size:9px">${INVASION_TEXT[S.G.invasion]||'—'}</div></div>`;
+  // Clear target pins/strip until a draw happens
+  document.getElementById('target-pins').innerHTML='';
+  document.getElementById('target-strip').style.display='none';
+  // Reset draw lock for the new day
+  S.M.targetsDrawnToday=false;
+  updateFlyMissionBtn();
+}
+function updateFlyMissionBtn(){
+  const btn=document.getElementById('fly-mission-btn');
+  if(!btn)return;
+  if(S.M.targetsDrawnToday){
+    btn.textContent='Targets Already Drawn Today';
+    btn.disabled=true;
+    btn.style.opacity='.4';
+    btn.style.cursor='not-allowed';
+  } else {
+    btn.textContent='▶ Fly Mission — Draw Targets';
+    btn.disabled=false;
+    btn.style.opacity='1';
+    btn.style.cursor='pointer';
+  }
+}
+function startTargetDraw(){
+  if(S.M.targetsDrawnToday){toast('Targets already drawn for today');return;}
+  const drawN=S.G.recon>=5?1:2;
+  const pool=shuffle([...TGTS]);
+  S.M.drawnTgts=pool.slice(0,drawN);
+  S.M.tgt=null;
+  S.M.targetsDrawnToday=true;
+  updateFlyMissionBtn();
+  // Place pins on map
+  const pinsEl=document.getElementById('target-pins');
+  pinsEl.innerHTML=S.M.drawnTgts.map((t,i)=>{
+    let [x,y]=TARGET_COORDS[t.id]||[NaN,NaN];
+    if(isNaN(x)){x=300+i*120;y=300+i*40;} // fallback placement
+    return`<g class="tgt-pin" data-tid="${t.id}"
+        onclick="selectTargetFromMap(${i})"
+        onmousedown="startLongPress(${i})" onmouseup="endLongPress()" onmouseleave="endLongPress()"
+        ontouchstart="startLongPress(${i})" ontouchend="endLongPress()" ontouchcancel="endLongPress()">
+      <circle class="tgt-pin-circle" cx="${x}" cy="${y}" r="16"/>
+      <text class="tgt-pin-text" x="${x}" y="${y}">${t.id}</text>
+    </g>`;
+  }).join('');
+  // Bottom strip
+  document.getElementById('ts-day').textContent=S.G.day;
+  document.getElementById('target-strip').style.display='block';
+  renderTargetStrip();
+  document.getElementById('cn-tgt').style.display='flex';
+  gotoMissionScreen('map');
+  toast(drawN+' target'+(drawN>1?'s':'')+' drawn — tap a pin or card');
+}
+// Long-press on map pin / target card to highlight location in red
+let _lpTimer=null;
+function startLongPress(i){
+  clearTimeout(_lpTimer);
+  _lpTimer=setTimeout(()=>highlightTargetOnMap(i),450);
+}
+function endLongPress(){clearTimeout(_lpTimer);}
+function highlightTargetOnMap(i){
+  const t=S.M.drawnTgts[i];if(!t)return;
+  document.querySelectorAll('#target-pins .tgt-pin-circle').forEach(c=>c.classList.remove('longpress-hl'));
+  const pin=document.querySelector(`#target-pins .tgt-pin[data-tid="${t.id}"] .tgt-pin-circle`);
+  if(pin){
+    pin.classList.add('longpress-hl');
+    pin.scrollIntoView&&pin.scrollIntoView({behavior:'smooth',block:'center'});
+    setTimeout(()=>pin.classList.remove('longpress-hl'),1800);
+  }
+  toast('📍 #'+t.id+' '+t.n+' highlighted on map');
+}
+function renderTargetStrip(){
+  document.getElementById('ts-cards').innerHTML=S.M.drawnTgts.map((t,i)=>`
+    <div class="ts-card ${S.M.tgt?.id===t.id?'sel':''}" onclick="selectTargetFromMap(${i})"
+        onmousedown="startLongPress(${i})" onmouseup="endLongPress()" onmouseleave="endLongPress()"
+        ontouchstart="startLongPress(${i})" ontouchend="endLongPress()" ontouchcancel="endLongPress()">
+      <div class="ts-card-top"><span class="ts-card-n">#${t.id} ${t.n}</span><span class="ts-card-vp">${t.vp}VP</span></div>
+      <div class="ts-card-stats">
+        <span>Hits: ${t.hits||'Obj'}</span><span>·</span><span>A/C: ${t.ac}</span>
+        <span>·</span><span>S: ${t.sA}/${t.sC}</span><span>B: ${t.bA}/${t.bC}</span>
+      </div>
+      <div class="ts-card-flags">
+        ${t.fixed?'<span class="bdg bA">Fixed</span>':''}${t.hard?'<span class="bdg bR">Hard</span>':''}
+        ${t.inv?'<span class="bdg bR">Invasion</span>':''}${t.esc?'<span class="bdg bG">Esc</span>':''}
+      </div>
+    </div>`).join('');
+}
+function selectTargetFromMap(i){
+  S.M.tgt=S.M.drawnTgts[i];
+  renderTargetStrip();
+  // Update pin highlight
+  document.querySelectorAll('#target-pins .tgt-pin-circle').forEach((c,idx)=>{
+    c.classList.toggle('selected',idx===i);
+  });
+  showTargetDetail();
+}
+function showTargetDetail(){
+  const t=S.M.tgt;if(!t)return;
+  gotoMissionScreen('target');
+  document.getElementById('cn-tgt').classList.add('on');
+  const adjHits=t.hits+S.G.infra;
+  let [x,y]=TARGET_COORDS[t.id]||[400,300];
+  document.getElementById('target-detail-pin').innerHTML=`
+    <circle class="tgt-pin-circle selected" cx="${x}" cy="${y}" r="20"/>
+    <text class="tgt-pin-text" x="${x}" y="${y}" style="font-size:16px">${t.id}</text>`;
+  document.getElementById('target-detail-body').innerHTML=`
+    <div style="margin-bottom:14px">
+      <div style="font-size:24px;font-weight:900;color:var(--gold2);line-height:1.15">#${t.id} ${t.n}</div>
+      <div style="font-size:12px;color:var(--ink2);margin-top:4px">Day ${S.G.day} · ${t.vp} Victory Points</div>
+    </div>
+    <div class="card mb8 td-card">
+      <div class="row td-row"><span class="rl">Hits required</span><span class="rv">${adjHits}${S.G.infra?` (${t.hits}+${S.G.infra} infra)`:''}</span></div>
+      <div class="row td-row"><span class="rl">Max aircraft</span><span class="rv">${t.ac}</span></div>
+      <div class="row td-row"><span class="rl">Target Stress</span><span class="rv a">+${t.st}</span></div>
+    </div>
+    <div class="card mb8 td-card">
+      <div class="row td-row"><span class="rl">Approach Sites</span><span class="rv r">${t.sA}</span></div>
+      <div class="row td-row"><span class="rl">Approach Bandits</span><span class="rv a">${t.bA}</span></div>
+      <div class="row td-row"><span class="rl">Centre Sites</span><span class="rv r">${t.sC}</span></div>
+      <div class="row td-row"><span class="rl">Centre Bandits</span><span class="rv a">${t.bC}</span></div>
+    </div>
+    <div class="card mb8 td-card">
+      <div class="row td-row"><span class="rl">Recon gain</span><span class="rv b">+${t.rc}</span></div>
+      <div class="row td-row"><span class="rl">Intel gain</span><span class="rv b">+${t.ic}</span></div>
+      <div class="row td-row"><span class="rl">Infra gain</span><span class="rv b">+${t.inf}</span></div>
+      ${t.inv?'<div class="row td-row"><span class="rl">Invasion</span><span class="rv r">Advances if not destroyed</span></div>':''}
+    </div>
+    <div class="ts-card-flags mb8" style="gap:6px">
+      ${t.fixed?'<span class="bdg bA" style="font-size:10px;padding:3px 8px">Fixed</span>':''}${t.hard?'<span class="bdg bR" style="font-size:10px;padding:3px 8px">Hard</span>':''}
+      ${t.inv?'<span class="bdg bR" style="font-size:10px;padding:3px 8px">Invasion</span>':''}${t.soft?'<span class="bdg bGr" style="font-size:10px;padding:3px 8px">Soft</span>':''}
+      ${t.veh?'<span class="bdg bB" style="font-size:10px;padding:3px 8px">Vehicle</span>':''}${t.esc?'<span class="bdg bG" style="font-size:10px;padding:3px 8px">Escalation</span>':''}
+    </div>
+    <button class="btn btn-y full" onclick="confirmTarget()">Confirm Target — Seed Sites →</button>
+    <button class="btn btn-x full mt4" onclick="gotoMissionScreen('map')">← Back to Map</button>`;
+}
+function confirmTarget(){
+  if(!S.M.tgt){toast('Select a target first');return;}
+  document.getElementById('cn-seed').style.display='flex';
+  gotoMissionScreen('seed');
+  seedSetup();
+}
+
+// ═══════════════════════════════════════
+// STEP 5 — SITE SEEDING
+// ═══════════════════════════════════════
+function seedSetup(){
+  const t=S.M.tgt;const G=S.G;
+  // Intel modifier — reduces centre threats
+  const intelMod=G.intel;
+  let ctrSAdj=Math.max(0,t.sC-(intelMod>=7?2:intelMod>=5?1:0));
+  let ctrBAdj=Math.max(0,t.bC-(intelMod>=8?2:intelMod>=6?1:0));
+  // Difficulty adjustments
+  let diffMod=0;
+  if(S.adjActive.includes('extra-threats')){ctrSAdj++;ctrBAdj++;diffMod=1;}
+  if(S.adjActive.includes('fewer-threats')){ctrSAdj=Math.max(0,ctrSAdj-1);ctrBAdj=Math.max(0,ctrBAdj-1);diffMod=-1;}
+  if(S.adjActive.includes('imp-threats')){diffMod=1;}
+  if(S.adjActive.includes('down-threats')){diffMod=-1;}
+  document.getElementById('seed-sA').textContent=t.sA;
+  document.getElementById('seed-bA').textContent=t.bA;
+  document.getElementById('seed-sC').textContent=ctrSAdj+(ctrSAdj!==t.sC?` (base ${t.sC})`:'');
+  document.getElementById('seed-bC').textContent=ctrBAdj+(ctrBAdj!==t.bC?` (base ${t.bC})`:'');
+  document.getElementById('seed-intel').textContent=intelMod>0?`−${Math.floor(intelMod/2)} threats`:'No reduction';
+  document.getElementById('seed-diff').textContent=diffMod>0?'+1 extra threat':diffMod<0?'−1 fewer threat':'None';
+  // Store adjusted counts
+  S.M._sA=t.sA;S.M._bA=t.bA;S.M._sC=ctrSAdj;S.M._bC=ctrBAdj;S.M._diffMod=diffMod;
+  // Show remaining pool counts
+  renderPoolDisplay();
+  // Clear zone displays
+  document.getElementById('zone-app-sites').innerHTML='<div class="tiny dim">No threats placed yet</div>';
+  document.getElementById('zone-ctr-sites').innerHTML='<div class="tiny dim">No threats placed yet</div>';
+  document.getElementById('seed-next').style.display='none';
+}
+function renderPoolDisplay(){
+  const counts={};
+  SITE_POOL.forEach(k=>{counts[k]=(counts[k]||0)+1;});
+  document.getElementById('pool-display').innerHTML=Object.entries(SD).map(([k,s])=>`
+    <div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--line);font-size:9px">
+      <span style="color:var(--red2)">${s.icon}</span>
+      <span style="flex:1;color:var(--ink2)">${s.name}</span>
+      <span class="bdg bX">${counts[k]||0}×</span>
+    </div>`).join('');
+}
+function seedThreats(){
+  const sPool=shuffle([...SITE_POOL]);
+  const bPool=shuffle([...BANDIT_POOL]);
+  // Draw sites
+  S.M.appSites=sPool.slice(0,S.M._sA).map(k=>({key:k,data:{...SD[k]},status:'active'}));
+  S.M.ctrSites=sPool.slice(S.M._sA,S.M._sA+S.M._sC).map(k=>({key:k,data:{...SD[k]},status:'active'}));
+  // Bandits drawn but placed after OT event — show placeholder
+  S.M.appBandits=bPool.slice(0,S.M._bA).map(k=>({key:k,data:BD[k]?{...BD[k]}:{...BD.none},status:'active'}));
+  S.M.ctrBandits=bPool.slice(S.M._bA,S.M._bA+S.M._bC).map(k=>({key:k,data:BD[k]?{...BD[k]}:{...BD.none},status:'active'}));
+  // Render zones
+  document.getElementById('zone-app-sites').innerHTML=renderThreatCounters(S.M.appSites,'site');
+  document.getElementById('zone-ctr-sites').innerHTML=renderThreatCounters(S.M.ctrSites,'site');
+  document.getElementById('seed-next').style.display='flex';
+  toast('Threats placed');
+}
+function renderThreatCounters(threats,type){
+  if(!threats.length)return'<div class="tiny dim">None</div>';
+  return threats.filter(t=>!t.data.name||t.data.name!=='No Bandit').map(t=>`
+    <div class="threat-counter">
+      <div class="tc-icon" style="color:${type==='site'?'var(--red2)':'var(--amber2)'}">${t.data.icon||'◆'}</div>
+      <div class="tc-info">
+        <div class="tc-n">${t.data.name}</div>
+        <div class="tc-d">Mod: ${t.data.mod>=0?'+':''}${t.data.mod} · S/D/K: ${t.data.stress}/${t.data.dam}/${t.data.dest}</div>
+      </div>
+      <div class="tc-status act">ACTIVE</div>
+    </div>`).join('')||'<div class="tiny dim">None</div>';
+}
+
+// ═══════════════════════════════════════
+// STEP 6 — ARM AIRCRAFT
+// ═══════════════════════════════════════
+function goArm(){
+  document.getElementById('cn-arm').style.display='flex';
+  gotoMissionScreen('arm');
+  S.M.selectedPilots=[];S.M.wLoads={};S.M.activePilot=null;
+  // Render available pilots
+  const avail=S.G.pilots.filter(p=>p.status==='OK');
+  document.getElementById('arm-pilots').innerHTML=avail.map(p=>{
+    const idx=S.G.pilots.indexOf(p);const rd=getRd(p);
+    const inMis=S.M.selectedPilots.includes(idx);
+    return`<div class="pc ${inMis?'inq':''}" id="ap-${idx}" onclick="togMisPilot(${idx})">
+      <div class="pc-h" style="cursor:pointer">
+        <div style="flex:1">
+          <div class="pc-n">${p.name} ${inMis?'<span class="bdg bGr">✓ Flying</span>':''}</div>
+          <div class="pc-sub mt4">${rkBdg(p.rank)}<span class="bdg bX" style="font-size:7px">${p.ac}</span></div>
+        </div>
+        <div style="font-size:8px;color:var(--ink3);text-align:right">
+          ATA ${fm(pATA(p))}<br>${pATG(p)!==null?'ATG '+fm(pATG(p)):'Air Sup'}
+        </div>
+      </div>
+    </div>`;
+  }).join('')||'<div class="sm dim">No available pilots</div>';
+  updateArmSummary();
+}
+function togMisPilot(idx){
+  const pos=S.M.selectedPilots.indexOf(idx);
+  if(pos!==-1){
+    S.M.selectedPilots.splice(pos,1);
+    delete S.M.wLoads[idx];
+    if(S.M.activePilot===idx)S.M.activePilot=null;
+  } else {
+    if(S.M.tgt&&S.M.selectedPilots.length>=S.M.tgt.ac){toast('Max '+S.M.tgt.ac+' aircraft for this target');return;}
+    S.M.selectedPilots.push(idx);
+    S.M.activePilot=idx;
+  }
+  goArm();showWeapons(S.M.activePilot);
+}
+function showWeapons(idx){
+  S.M.activePilot=idx;
+  const nameEl=document.getElementById('arm-pilot-name');
+  if(idx===null){
+    if(nameEl)nameEl.textContent='—';
+    document.getElementById('arm-weapon-area').innerHTML='<div class="sm dim ctr" style="padding:16px">Select a pilot ← to arm</div>';
+    return;
+  }
+  const p=S.G.pilots[idx];if(nameEl)nameEl.textContent=p.name;
+  if(!S.M.wLoads[idx])S.M.wLoads[idx]=[];
+  const ac=ACD[p.ac];const avail=ac?ac.w.filter(w=>WD[w]):[];
+  document.getElementById('arm-weapon-area').innerHTML=`<div class="tiny dim mb4">Tap to select/deselect weapons for ${p.name}</div>
+    <div class="wg">${avail.map(w=>{
+      const wd=WD[w];const sel=(S.M.wLoads[idx]||[]).includes(w);
+      return`<div class="wb ${wd.t==='ATA'?'ata':wd.t==='ATG'?'atg':''} ${sel?'sel':''}" onclick="togWeapon(${idx},'${w}')">
+        <div class="wb-n">${w}</div>
+        <div class="wb-d">${wd.t}${wd.d&&wd.d.length?' · '+wd.d.filter(x=>x>0).join('/'):''}${wd.w?' · W'+wd.w:''}</div>
+      </div>`;
+    }).join('')}</div>`;
+  updateArmSummary();
+}
+function togWeapon(idx,w){
+  if(!S.M.wLoads[idx])S.M.wLoads[idx]=[];
+  const pos=S.M.wLoads[idx].indexOf(w);
+  if(pos!==-1)S.M.wLoads[idx].splice(pos,1);else S.M.wLoads[idx].push(w);
+  showWeapons(idx);
+}
+function updateArmSummary(){
+  const sub=document.getElementById('arm-sub');
+  if(sub)sub.textContent=S.M.selectedPilots.length+' pilot'+(S.M.selectedPilots.length!==1?'s':'')+' assigned';
+  const el=document.getElementById('arm-summary');if(!el)return;
+  el.innerHTML=S.M.selectedPilots.map(idx=>{
+    const p=S.G.pilots[idx];const ws=S.M.wLoads[idx]||[];
+    return`<div style="display:flex;align-items:center;gap:5px;padding:3px 0;border-bottom:1px solid var(--line);font-size:9px">
+      <span style="font-weight:700;color:var(--ink)">${p.name}</span>
+      <span class="dim">—</span>
+      ${ws.length?ws.map(w=>`<span class="bdg bA" style="font-size:7px">${w}</span>`).join(''):'<span class="dim">No weapons</span>'}
+    </div>`;
+  }).join('');
+  const lb=document.getElementById('launch-btn');
+  if(lb)lb.style.display=S.M.selectedPilots.length?'flex':'none';
+}
+function launchMission(){
+  S.M.alt=gop('alt-g')||'low';
+  toast('Mission launched! Tactical display coming next build.',3000);
+  // Save state
+  localStorage.setItem('iaf_save',JSON.stringify({...S.G,currentMission:S.M}));
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+const M=S.M; // alias to fix weapon toggle reference
+document.addEventListener('DOMContentLoaded',()=>{
+  upLen();upDiff();renderStep();
+  // Try loading saved game
+  const saved=localStorage.getItem('iaf_save');
+  if(saved){try{const g=JSON.parse(saved);if(g.started){/* could offer continue */}}catch(e){}}
+});
+</script>
+</body>
+</html>
